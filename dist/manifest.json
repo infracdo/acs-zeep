@@ -1,0 +1,14 @@
+{
+  "name": "Apollo ACS",
+  "short_name": "ACS",
+  "icons": [
+    {
+      "src": "./img/icons/ACSlogo.png",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#424242",
+  "theme_color": "#FFFFFF"
+}

@@ -1,0 +1,16 @@
+version: '3.7'
+
+volumes:
+  logs:
+    driver: local
+
+services:
+  vue-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/app/src
