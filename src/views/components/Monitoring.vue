@@ -299,6 +299,7 @@ export default {
       accessPointOptions: [],
       selectedAccessPoint: null,
       loading: false,
+      fetchInterval: null,
     };
   },
   computed: {
@@ -315,6 +316,17 @@ export default {
   },
   async created() {
     await this.fetchData();
+  },
+  mounted() {
+    this.fetchData();
+    this.fetchInterval = setInterval(() => {
+      this.fetchData();
+    }, 30000);
+  },
+  beforeDestroy() {
+    if (this.fetchInterval) {
+      clearInterval(this.fetchInterval);
+    }
   },
   methods: {
     async fetchData() {
