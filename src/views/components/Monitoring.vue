@@ -316,17 +316,14 @@ export default {
   },
   async created() {
     await this.fetchData();
-  },
-  mounted() {
-    this.fetchData();
+
+    // Fetch data every 30 seconds
     this.fetchInterval = setInterval(() => {
       this.fetchData();
     }, 30000);
   },
   beforeDestroy() {
-    if (this.fetchInterval) {
-      clearInterval(this.fetchInterval);
-    }
+    clearInterval(this.fetchInterval);
   },
   methods: {
     async fetchData() {
