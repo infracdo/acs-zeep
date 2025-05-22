@@ -41,6 +41,11 @@ module.exports = {
     'vuetify/no-deprecated-classes': 'warn',
     'vuetify/grid-unknown-attributes': 'warn',
     'vuetify/no-legacy-grid': 'warn',
+    'max-len': 'off',
+    'eol-last': 'off',
+    'vue/v-slot-style': 'off',
+    'vue/valid-v-slot': 'off',
+    quotes: 'off',
   },
   parserOptions: {
     parser: 'babel-eslint',
