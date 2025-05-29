@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "https://acs-be-test.apollo.com.ph",
+  baseURL: "https://zeep-be-test.apolloglobal.net",
   headers: {
     "Content-type": "application/json",
   },
