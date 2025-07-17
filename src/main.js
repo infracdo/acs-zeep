@@ -13,6 +13,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
+import http, { attachAuthInterceptor } from './http-common';
 import './router/permission';
 
 function scheduleTokenRefresh(keycloak) {
@@ -34,8 +35,6 @@ function scheduleTokenRefresh(keycloak) {
       .then((refreshed) => {
         if (refreshed) {
           console.log("Token refreshed");
-        } else {
-          console.log("Token still valid");
         }
         scheduleTokenRefresh(keycloak);
       })
@@ -48,27 +47,6 @@ function scheduleTokenRefresh(keycloak) {
   }, refreshTime);
 }
 
-function setupAxiosInterceptor(keycloak) {
-  axios.interceptors.request.use(
-    async (config) => {
-      try {
-        if (keycloak.isTokenExpired?.()) {
-          await keycloak.updateToken(30);
-        }
-        if (keycloak.token) {
-          config.headers.Authorization = `Bearer ${keycloak.token}`;
-        }
-        return config;
-      } catch (err) {
-        console.warn("Token refresh failed. Logging out.");
-        keycloak.logout({ redirectUri: window.location.origin });
-        return Promise.reject(err);
-      }
-    },
-    (error) => Promise.reject(error)
-  );
-}
-
 Vue.use(VueAxios, axios);
 
 Vue.use(VueKeyCloak, {
@@ -76,12 +54,12 @@ Vue.use(VueKeyCloak, {
     onLoad: 'login-required', "checkLoginIframe" : false
   },
   config: {
-    realm: 'workconnect-test',
-    url: 'https://wcdssi.apolloglobal.net:8443/auth',
-    clientId: 'acs-zeep-test',
+    realm: process.env.VUE_APP_KEYCLOAK_REALM,
+    url: process.env.VUE_APP_KEYCLOAK_URL,
+    clientId: process.env.VUE_APP_KEYCLOAK_CLIENT_ID,
   },
   onReady: (keycloak) => {
-    setupAxiosInterceptor(keycloak);
+    attachAuthInterceptor(keycloak);
     scheduleTokenRefresh(keycloak);
 
     new Vue({

@@ -399,7 +399,7 @@
     multiple
   >
   <v-expansion-panel>
-  <v-expansion-panel-header>Show rogue devicess</v-expansion-panel-header>
+  <v-expansion-panel-header>Show rogue devices</v-expansion-panel-header>
   <v-expansion-panel-content>
   <rogue-ap></rogue-ap>
   </v-expansion-panel-content>

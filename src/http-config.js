@@ -1,12 +1,8 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "https://acs-mb-test.apolloglobal.net",
+  baseURL: process.env.VUE_APP_ZEEP_PROVISIONING_URL,
   headers: {
     "Content-type": "application/json",
   },
-  // baseURL: "http://localhost:7547",
-  // headers: {
-  //   "Content-type": "application/json",
-  // },
 });
