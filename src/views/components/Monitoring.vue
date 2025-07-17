@@ -23,7 +23,7 @@
               class="font-weight-bold text-h3 text-right"
               style="text-align: right; display: block; color: white;"
             >
-              {{ card.value }}
+              {{ card.value !== null && card.value !== undefined ? card.value : '-' }}
             </v-card-title>
             <v-card-text
               class="text-right text-subtitle-2"
@@ -94,7 +94,7 @@
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white;"
               >
-                {{ card.value }}
+                {{ card.value !== null && card.value !== undefined ? card.value : '-' }}
               </v-card-title>
               <v-card-text
                 class="text-right text-subtitle-2"
@@ -141,6 +141,14 @@
               <template v-slot:item.calling_station_id="{item}">
                 {{ formatMacAddress(item.calling_station_id) }}
               </template>
+
+              <template v-slot:item.acctinputoctets="{item}">
+                {{ item.acctinputoctets ?? '-' }}
+              </template>
+
+              <template v-slot:item.acctoutputoctets="{item}">
+                {{ item.acctoutputoctets ?? '-' }}
+              </template>
             </v-data-table>
           </div>
         </v-card>
@@ -159,37 +167,37 @@ export default {
       cardsOverallSummary: [
         {
           title: 'Currently Connected Users',
-          value: 0,
+          value: '-',
           color: '#66BB6A',
           key: 'connectedUsers',
         },
         {
           title: 'Currently Connected Access Points',
-          value: 0,
+          value: '-',
           color: '#4DB6AC',
           key: 'connectedAPs',
         },
         {
           title: 'Total User Connections Today',
-          value: 0,
+          value: '-',
           color: '#FFB74D',
           key: 'totalUserConnectionsToday',
         },
         {
           title: 'Total Bandwidth Consumption Today',
-          value: 0,
+          value: '-',
           color: '#FDD835',
           key: 'totalBandwidthConsumptionToday',
         },
         {
           title: 'Average Connection Time',
-          value: 0,
+          value: '-',
           color: '#1E88E5',
           key: 'averageConnectionTime',
         },
         {
           title: 'Average Bandwidth Per Connection',
-          value: 0,
+          value: '-',
           color: '#E57373',
           key: 'averageBandwidthPerConnection',
         },
@@ -197,7 +205,7 @@ export default {
       cardsAP: [
         {
           title: 'Currently Connected Users',
-          value: 0,
+          value: '-',
           color: '#66BB6A',
           key: 'connectedUsersPerAP',
         },

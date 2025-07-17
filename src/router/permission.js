@@ -18,27 +18,64 @@ console.log('[router.whiteList]', whiteList);
 /**
  * Check user has permission for this routes.
  * 'admin' permission passed directly.
- * @param {Array} roles
- * @param {Array} permissionRoles
+ * @param {Array} userRoles
+ * @param {Array} routeRoles
  */
 // eslint-disable-next-line no-unused-vars
-function hasPermission(roles, permissionRoles) {
-  if (roles.includes('admin')) return true;
-  if (!permissionRoles) return true;
-  return roles.some((role) => permissionRoles.includes(role));
+function hasPermission(userRoles, routeRoles) {
+  if (userRoles.includes('ROLE_ADMIN_ACS_ZEEP')) return true;
+  if (!routeRoles) return true;
+  return userRoles.some((role) => routeRoles.includes(role));
+}
+
+function getAllUserRoles(keycloak) {
+  const realmRolesRaw = keycloak.tokenParsed?.realm_access?.roles || [];
+  const clientId = process.env.VUE_APP_KEYCLOAK_CLIENT_ID;
+  const clientRolesRaw = keycloak.tokenParsed?.resource_access?.[clientId]?.roles || [];
+  const groupsRaw = keycloak.tokenParsed?.groups || [];
+
+  // Normalize role names with prefix if needed
+  const prefixIfMissing = (item, prefix) =>
+    item.startsWith(prefix) ? item : `${prefix}${item}`;
+
+  const realmRoles = realmRolesRaw.map(role => prefixIfMissing(role, 'ROLE_'));
+  const clientRoles = clientRolesRaw.map(role => prefixIfMissing(role, 'ROLE_'));
+
+  // Normalize groups
+  const groups = groupsRaw.map(group => {
+    // Keycloak group paths often look like "/group-name", so remove slash
+    const groupName = group.replace(/^\//, '');
+    return prefixIfMissing(groupName, 'GROUP_');
+  });
+
+  // Combine and deduplicate
+  return [...new Set([...realmRoles, ...clientRoles, ...groups])];
 }
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
   if (router.app.$keycloak.authenticated) {
     const profile = await router.app.$keycloak.loadUserProfile();
+    const userRoles = getAllUserRoles(router.app.$keycloak);
+    console.log('[User Roles]', userRoles);
     console.log(profile);
+
     store.commit('SET_USER_INFO', {
       user: profile.username,
       name: `${profile.firstName} ${profile.lastName}`,
     });
     store.commit('SET_ROUTES', asyncRoutes);
-    next();
+    const requiredRoles = to.meta.roles;
+    console.log(`[router.beforeEach] Checking permissions for ${to.path} with roles:`, requiredRoles);
+
+    if (hasPermission(userRoles, requiredRoles)) {
+      console.log(`[router.beforeEach] User has permission for ${to.path}`);
+      next();
+    } else {
+      console.log(`[router.beforeEach] User lacks permission for ${to.path}`);
+      next(false);
+    }
+
   } else {
     const loginUrl = router.app.$keycloak.createLoginUrl({
       redirectUri: to.path,
