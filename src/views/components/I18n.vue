@@ -563,7 +563,7 @@
 
 <script>
 import http from "@/http-common";
-import config from "@/http-config";
+// import config from "@/http-config";
 
   export default {
     data: () => ({
@@ -824,7 +824,7 @@ import config from "@/http-config";
             console.log(e);
             });
         for (i in this.device) {
-          config
+          http
               .get("/DeleteObject/"+this.device[i].serial_number+", Device.WiFi.SSID."+this.editedItem.wlan_id+".")
               .then(response => {
               console.log(response.data);
@@ -950,7 +950,7 @@ import config from "@/http-config";
             console.log("if executing")
             if(this.modelArray.indexOf(this.device[i].model)>0 || this.modelArray.indexOf("ALL")>0){
               console.log("executing")
-              config
+              http
                   .get("/ExecuteGroupCommand/"+this.device[i].serial_number+", "+this.citems.id)
                   .then(response => {
                   console.log(response.data);
@@ -987,7 +987,7 @@ import config from "@/http-config";
                   console.log("if executing:" + response.data.id)
                   if(this.modelArray.indexOf(this.device[i].model)>0 || this.modelArray.indexOf("ALL")){
                     console.log("executing")
-                    config
+                    http
                         .post("/ExecuteGroupCommand/"+this.device[i].serial_number+", "+response.data.id)
                         .then(response => {
                         console.log(response.data);
@@ -1034,7 +1034,7 @@ import config from "@/http-config";
               console.log(e);
             });
           for (i in this.device) {
-            config
+            http
                 .post("/AddSSID/"+this.device[i].serial_number+", "+this.editedItem.id)
                 .then(response => {
                 console.log(response.data);
@@ -1055,7 +1055,7 @@ import config from "@/http-config";
                   this.ssid[this.ssid.length-1].id = response.data.id;
                   this.all_ssid[this.all_ssid.length-1].id = response.data.id;
                   for (i in this.device) {
-                    config
+                    http
                         .post("/AddSSID/"+this.device[i].serial_number+", "+response.data.id)
                         .then(response => {
                         console.log(response.data);

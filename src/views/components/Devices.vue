@@ -411,7 +411,7 @@
 
 <script>
 import http from "@/http-common";
-import config from "@/http-config";
+// import config from "@/http-config";
 import rogue from './Rogue-device.vue'
   export default {
     components: {
@@ -685,7 +685,7 @@ import rogue from './Rogue-device.vue'
                   console.log(e);
                 });
                 this.closeMove()
-              config
+              http
                   .get("/MoveDeviceGroup/"+this.selected[i].serial_number)
                   .then(response => {
                   console.log(response.data);
@@ -746,7 +746,7 @@ import rogue from './Rogue-device.vue'
         else if(index==0){
           var i, x = new Array();
           for (i in this.selected) {
-        config
+        http
             .get("/Reboot/"+this.selected[i].serial_number)
             .then(response => {
             console.log(response.data);
@@ -783,7 +783,7 @@ import rogue from './Rogue-device.vue'
         var body = '{,'+this.mode_url+','+this.mode_idtx+','+this.mode_idtx1+','+this.mode_idtx2+','+this.mode_stridx+','+this.mode_prompt+','+text+','+'}';
         console.log(body);
         this.code += text + "\n";
-        config
+        http
           .post("/WebCli/ "+this.cliserial, body)
           .then(response => {
             this.code += response.data.content; // JSON are parsed automatically.
@@ -806,7 +806,7 @@ import rogue from './Rogue-device.vue'
 
       getSuggest (text) {
         var body = '{,'+this.mode_url+','+this.mode_idtx+','+this.mode_idtx1+','+this.mode_idtx2+','+this.mode_stridx+','+this.mode_prompt+','+text+'?'+','+'}';
-        config
+        http
           .post("/CliAutoComplete/ "+this.cliserial, body)
           .then(response => {
             this.sampleSuggest = response.data.content.split("\r\n")
@@ -877,7 +877,7 @@ import rogue from './Rogue-device.vue'
               });
               this.close()
           if(this.parent_watcher!=this.editedItem.parent){
-            config
+            http
                 .get("/MoveDeviceGroup/"+this.editedItem.serial_number)
                 .then(response => {
                 console.log(response.data);

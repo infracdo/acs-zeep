@@ -527,7 +527,7 @@
 
 <script>
 import http from "@/http-common";
-import config from "@/http-config";
+// import config from "@/http-config";
 
 export default {
   data: () => ({
@@ -812,7 +812,7 @@ export default {
           console.log(e);
         });
       for (i in this.device) {
-        config
+        http
           .get(
             "/DeleteObject/" +
               this.device[i].serial_number +
@@ -976,7 +976,7 @@ export default {
             this.modelArray.indexOf("ALL") > 0
           ) {
             console.log("executing");
-            config
+            http
               .get(
                 "/ExecuteGroupCommand/" +
                   this.device[i].serial_number +
@@ -1021,7 +1021,7 @@ export default {
                 this.modelArray.indexOf("ALL")
               ) {
                 console.log("executing");
-                config
+                http
                   .post(
                     "/ExecuteGroupCommand/" +
                       this.device[i].serial_number +
@@ -1106,7 +1106,7 @@ export default {
             console.log(e);
           });
         for (i in this.device) {
-          config
+          http
             .post(
               "/AddSSID/" +
                 this.device[i].serial_number +
@@ -1132,7 +1132,7 @@ export default {
             this.ssid[this.ssid.length - 1].id = response.data.id;
             this.all_ssid[this.all_ssid.length - 1].id = response.data.id;
             for (i in this.device) {
-              config
+              http
                 .post(
                   "/AddSSID/" +
                     this.device[i].serial_number +

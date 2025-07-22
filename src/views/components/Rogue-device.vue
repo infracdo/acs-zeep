@@ -340,7 +340,7 @@
 
 <script>
 import http from "@/http-common";
-import config from "@/http-config";
+// import config from "@/http-config";
 export default {
   name: "rogue",
   data: () => ({
@@ -595,7 +595,7 @@ export default {
             console.log(e);
           });
         this.closeMove();
-        config
+        http
           .get("/MoveDeviceGroup/" + this.selected[i].serial_number)
           .then((response) => {
             console.log(response.data);
@@ -649,7 +649,7 @@ export default {
         var i,
           x = new Array();
         for (i in this.selected) {
-          config
+          http
             .get("/Reboot/" + this.selected[i].serial_number)
             .then((response) => {
               console.log(response.data);
@@ -681,24 +681,11 @@ export default {
     },
     sendcode(text) {
       this.getcode = "";
-      var body =
-        "{," +
-        this.mode_url +
-        "," +
-        this.mode_idtx +
-        "," +
-        this.mode_idtx1 +
-        "," +
-        this.mode_idtx2 +
-        "," +
-        this.mode_stridx +
-        "," +
-        this.mode_prompt +
-        "}";
-      console.log(body);
+      var body = '{,'+this.mode_url+','+this.mode_idtx+','+this.mode_idtx1+','+this.mode_idtx2+','+this.mode_stridx+','+this.mode_prompt+','+text+','+'}';
+      console.log("WebCli body " + body);
       this.code += text + "\n";
-      config
-        .post("/WebCli/" + this.cliserial + ", " + text, body)
+      http
+        .post("/WebCli/ " + this.cliserial, body)
         .then((response) => {
           this.code += response.data.content; // JSON are parsed automatically.
           this.apname = response.data.mode_tip;
@@ -759,7 +746,7 @@ export default {
             console.log(e);
           });
         if (this.parent_watcher != this.editedItem.parent) {
-          config
+          http
             .get("/MoveDeviceGroup/" + this.editedItem.serial_number)
             .then((response) => {
               console.log(response.data);
