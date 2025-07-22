@@ -112,7 +112,7 @@ export default {
       return this.iconShow && item.meta ? item.meta.icon : ' ';
     },
     getListTitle(item) {
-      return item.meta ? this.$t(item.meta.title) : '';
+      return item.meta ? item.meta.title : '';
     },
   },
 };

@@ -1,12 +1,26 @@
-import axios from "axios";
+import axios from 'axios';
 
-export default axios.create({
-  baseURL: "https://zeep-be-test.apollo.com",
+// Create a custom axios instance
+const http = axios.create({
+  baseURL: process.env.VUE_APP_ZEEP_MONITORING_URL,
   headers: {
-    "Content-type": "application/json",
+    'Content-Type': 'application/json',
   },
-  // baseURL: "http://localhost:7547",
-  // headers: {
-  //   "Content-type": "application/json",
-  // },
 });
+
+// Attach Keycloak token to all requests
+export function attachAuthInterceptor(keycloak) {
+  http.interceptors.request.use(
+    async (config) => {
+      if (keycloak.isTokenExpired()) {
+        await keycloak.updateToken(30);
+      }
+
+      config.headers.Authorization = `Bearer ${keycloak.token}`;
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+}
+
+export default http;
