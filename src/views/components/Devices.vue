@@ -778,13 +778,13 @@ import rogue from './Rogue-device.vue'
         if(item.device_name==null) this.cliheader= item.serial_number;
         else this.cliheader= item.device_name;
       },
-      sendcode (text) {
+      sendcode(text) {
         this.getcode = '';
         var body = '{,'+this.mode_url+','+this.mode_idtx+','+this.mode_idtx1+','+this.mode_idtx2+','+this.mode_stridx+','+this.mode_prompt+','+text+','+'}';
         console.log(body);
         this.code += text + "\n";
         http
-          .post("/WebCli/ "+this.cliserial, body)
+          .post("/WebCli/"+this.cliserial, body)
           .then(response => {
             this.code += response.data.content; // JSON are parsed automatically.
             console.log(this.sampleSuggest)

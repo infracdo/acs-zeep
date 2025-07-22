@@ -685,7 +685,7 @@ export default {
       console.log("WebCli body " + body);
       this.code += text + "\n";
       http
-        .post("/WebCli/ " + this.cliserial, body)
+        .post("/WebCli/"+this.cliserial, body)
         .then((response) => {
           this.code += response.data.content; // JSON are parsed automatically.
           this.apname = response.data.mode_tip;
