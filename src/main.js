@@ -61,6 +61,7 @@ Vue.use(VueKeyCloak, {
   onReady: (keycloak) => {
     attachAuthInterceptor(keycloak);
     scheduleTokenRefresh(keycloak);
+    // console.log(keycloak.token);
 
     new Vue({
       router,
