@@ -148,14 +148,13 @@
                     ></v-subheader>
                   </v-col>
                   <v-col cols="4" md="4">
-                    <v-select
-                      :items="['Access Point']" 
+                    <v-text-field
                       v-model="editedItem.device_type"
-                      item-value="Access Point"
-                      :rules="[(v) => !!v || 'Device type is required']"
+                      label="Access Point"
                       outlined
                       dense
-                    ></v-select>
+                      readonly
+                    ></v-text-field>
                   </v-col>
                 </v-row>
                 <v-subheader
@@ -181,7 +180,7 @@
                   text
                   @click="save"
                 >
-                  Save
+                  Submit
                 </v-btn>
               </v-card-actions>
             </v-form>
@@ -331,7 +330,7 @@
       {{ item.status }}
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+      <v-icon small class="mr-2" @click="editItem(item)"> mdi-plus-box </v-icon>
       <!-- <v-icon small @click="opencli(item)"> mdi-console </v-icon> -->
     </template>
     <template v-slot:no-data> No data to display </template>

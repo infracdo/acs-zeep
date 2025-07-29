@@ -103,7 +103,7 @@
           persistent
           max-width="1000px"
         >
-          <template v-slot:activator="{ on, attrs }">
+          <!-- <template v-slot:activator="{ on, attrs }">
             <v-btn
               color="primary"
               dark
@@ -114,7 +114,7 @@
             >
               New Devices
             </v-btn>
-          </template>
+          </template> -->
           <v-card>
             <v-card-title>
               <span class="headline">{{ formTitle }}</span>
@@ -377,7 +377,7 @@
         {{ item.status }}
 
     </template>
-    <template v-slot:[`item.actions`]="{ item }">
+    <!-- <template v-slot:[`item.actions`]="{ item }">
       <v-icon
         class="mr-2"
         @click="editItem(item)"
@@ -389,7 +389,7 @@
       >
         mdi-console
       </v-icon>
-    </template>
+    </template> -->
     <template v-slot:no-data>
       No data to display
     </template>
@@ -483,7 +483,7 @@ import rogue from './Rogue-device.vue'
         { text: 'Mac Address', value: 'mac_address', show: true },
         { text: 'Offline Time', value: 'date_offline', show: true },
         { text: 'Modified Time', value: 'date_modified', show: true },
-        { text: 'Action', value: 'actions', sortable: false, show: true },
+        // { text: 'Action', value: 'actions', sortable: false, show: true },
       ],
     serialRules: [
       v => !!v || 'Serial is required',
