@@ -6,7 +6,7 @@
     <!-- Overall Summary -->
     <v-card class="pa-4 mb-6">
       <v-card-title class="pa-0">
-        Overall Summary
+        Overall RADIUS Summary 
       </v-card-title>
       <v-row>
         <v-col
@@ -44,7 +44,7 @@
       >
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
-            List of Access Points
+            List of Active Users per AP
           </v-card-title>
         </v-col>
         <v-col
@@ -79,6 +79,75 @@
         </v-col>
       </v-row>
       <v-col class="pa-0">
+        <!-- Table for list of currently connected users per access point -->
+        <v-card class="mt-3">
+          <!-- <v-card-title>
+            List of Currently Connected Users
+            <v-spacer />
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+            />
+          </v-card-title> -->
+          <div style="overflow-x: auto;">
+            <v-data-table
+              dense
+              :headers="userHeaders"
+              :items="connectedUsers"
+              item-key="macAddress"
+              :loading="loading"
+              loading-text="Loading... Please wait"
+              style="min-width: 1000px"
+              class="header-nowrap"
+            >
+              <!-- Format Date Created column -->
+              <template v-slot:item.date_created="{item}">
+                {{ formatTimestamp(item.date_created) }}
+              </template>
+
+              <!-- Format MAC address -->
+              <template v-slot:item.mac_address="{item}">
+                {{ formatMacAddress(item.mac_address) }}
+              </template>
+            </v-data-table>
+          </div>
+        </v-card>
+      </v-col>
+    </v-card>
+
+    <!-- List of Online APs -->
+    <v-card class="pa-4 mb-6">
+      <v-row
+        align="center"
+        class="ma-0"
+      >
+        <v-col class="pa-0">
+          <v-card-title class="pa-0 mb-3">
+            List of Active APs in ACS
+          </v-card-title>
+        </v-col>
+        <!-- <v-col
+          class="pa-0"
+          cols="auto"
+        >
+          <v-select
+            v-model="selectedAccessPoint"
+            flat
+            solo-inverted
+            hide-details
+            :items="formattedAccessPointOptions"
+            item-text="text"
+            item-value="value"
+            style="width: 20em;"
+            label="Select Access Point (AP)"
+            @change="onAPChange"
+          />
+        </v-col> -->
+      </v-row>
+      <v-col class="pa-0">
         <v-row>
           <v-col
             v-for="(card, index) in cardsAP"
@@ -108,23 +177,23 @@
 
         <!-- Table for list of currently connected users per access point -->
         <v-card class="mt-3">
-          <v-card-title>
+          <!-- <v-card-title>
             List of Currently Connected Users
-            <!-- <v-spacer />
+            <v-spacer />
             <v-text-field
               v-model="search"
               append-icon="mdi-magnify"
               label="Search"
               single-line
               hide-details
-            /> -->
-          </v-card-title>
+            />
+          </v-card-title> -->
           <div style="overflow-x: auto;">
             <v-data-table
               dense
-              :headers="headers"
-              :items="connectedUsers"
-              item-key="macAddress"
+              :headers="apHeaders"
+              :items="allConnectedAPData"
+              item-key="serial_number"
               :loading="loading"
               loading-text="Loading... Please wait"
               style="min-width: 1000px"
@@ -135,7 +204,7 @@
               </template>
 
               <template v-slot:item.timestamp="{item}">
-                {{ formatTimestamp(item.timestamp) }}
+                {{ formatTimestamp(item.date_created) }}
               </template>
 
               <template v-slot:item.calling_station_id="{item}">
@@ -166,37 +235,37 @@ export default {
     return {
       cardsOverallSummary: [
         {
-          title: 'Currently Connected Users',
+          title: 'Active RADIUS Users',
           value: '-',
           color: '#66BB6A',
           key: 'connectedUsers',
         },
         {
-          title: 'Currently Connected Access Points',
+          title: 'Active APs in RADIUS',
           value: '-',
           color: '#4DB6AC',
           key: 'connectedAPs',
         },
         {
-          title: 'Total User Connections Today',
+          title: 'Current RADIUS Sessions',
           value: '-',
           color: '#FFB74D',
           key: 'totalUserConnectionsToday',
         },
         {
-          title: 'Total Bandwidth Consumption Today',
+          title: 'Total AP Bandwidth Usage',
           value: '-',
           color: '#FDD835',
           key: 'totalBandwidthConsumptionToday',
         },
         {
-          title: 'Average Connection Time',
+          title: 'Average Session Duration',
           value: '-',
           color: '#1E88E5',
           key: 'averageConnectionTime',
         },
         {
-          title: 'Average Bandwidth Per Connection',
+          title: 'Average Bandwidth per Session',
           value: '-',
           color: '#E57373',
           key: 'averageBandwidthPerConnection',
@@ -204,10 +273,10 @@ export default {
       ],
       cardsAP: [
         {
-          title: 'Currently Connected Users',
+          title: 'Active APs in ACS',
           value: '-',
-          color: '#66BB6A',
-          key: 'connectedUsersPerAP',
+          color: '#4DB6AC',
+          key: 'allConnectedAPData',
         },
       ],
       // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -261,7 +330,7 @@ export default {
       //     value: 'lastActive',
       //   },
       // ],
-      headers: [
+      userHeaders: [
         {
           text: 'Username',
           align: 'start',
@@ -299,10 +368,49 @@ export default {
           value: 'timestamp',
         },
       ],
+      apHeaders: [
+        {
+          text: 'Serial Number',
+          align: 'start',
+          sortable: true,
+          value: 'serial_number',
+        },
+        {
+          text: 'Device Name',
+          align: 'start',
+          sortable: true,
+          value: 'device_name',
+        },
+        {
+          text: 'Mac Address',
+          align: 'start',
+          sortable: true,
+          value: 'mac_address',
+        },
+        {
+          text: 'Status',
+          align: 'start',
+          sortable: true,
+          value: 'status',
+        },
+        {
+          text: 'Group',
+          align: 'start',
+          sortable: true,
+          value: 'parent',
+        },
+        {
+          text: 'Date Created',
+          align: 'start',
+          sortable: true,
+          value: 'date_created',
+        },
+      ],
       connectedUsersPerAP: 0,
       connectedUsersPerAPMap: {},
       connectedUsers: [],
       allConnectedUsersData: [],
+      allConnectedAPData: [],
       currentConnectedAPs: [],
       accessPointOptions: [],
       selectedAccessPoint: null,
@@ -349,6 +457,7 @@ export default {
           countConnectedUsersPerApResponse,
           connectedUsersPerApResponse,
           accessPointsResponse,
+          accessPointsInfoResponse,
         ] = await Promise.all([
           ApiService.getCountCurrentlyConnectedUsers(),
           ApiService.getCountCurrentlyConnectedAPs(),
@@ -359,6 +468,7 @@ export default {
           ApiService.getCountCurrentlyConnectedUsersPerAP(),
           ApiService.getCurrentlyConnectedUsersPerAP(),
           ApiService.getAccessPoints(),
+          ApiService.getAccessPointsInfo(),
         ]);
 
         // Update overall summary cards
@@ -368,6 +478,8 @@ export default {
         this.cardsOverallSummary[3].value = totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
         this.cardsOverallSummary[4].value = avgConnectionTimeResponse.data.averageConnectionTime;
         this.cardsOverallSummary[5].value = avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
+
+        this.cardsAP[0].value = countConnectedAPsResponse.data.currentlyConnectedAPs;
 
         // Convert array to map
         this.connectedUsersPerAPMap = {};
@@ -379,6 +491,9 @@ export default {
 
         // Store all connected users data
         this.allConnectedUsersData = connectedUsersPerApResponse.data;
+
+        this.allConnectedAPData = accessPointsInfoResponse.data;
+        this.cardsAP[0].value = this.allConnectedAPData.length;
 
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -418,7 +533,7 @@ export default {
       if (!this.selectedAccessPoint) return;
       // Update the count of connected users
       this.connectedUsersPerAP = this.connectedUsersPerAPMap[this.selectedAccessPoint] || 0;
-      this.cardsAP[0].value = this.connectedUsersPerAP;
+      // this.cardsAP[0].value = this.connectedUsersPerAP;
       // Find the AP data in allConnectedUsersData
       const apData = this.allConnectedUsersData.find(
         // (ap) => ap.apMacAddress === this.selectedAccessPoint, // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
