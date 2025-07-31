@@ -75,6 +75,10 @@ class ApiService {
   getAccessPoints() {
     return http.get('/api/radius/access-points');
   }
+  
+  getAccessPointsInfo() {
+    return http.get('/api/radius/access-points-info');
+  }
 }
 /* eslint-enable class-methods-use-this */
 

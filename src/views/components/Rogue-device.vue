@@ -150,6 +150,7 @@
                   <v-col cols="4" md="4">
                     <v-text-field
                       v-model="editedItem.device_type"
+                      :disabled="editedIndex != -1"
                       label="Access Point"
                       outlined
                       dense
@@ -535,6 +536,7 @@ export default {
       this.parent_watcher = item.parent;
       this.editedIndex = this.device.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      this.editedItem.device_type = "Access Point";
     },
 
     cancelClose() {
