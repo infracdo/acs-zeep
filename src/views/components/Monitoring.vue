@@ -421,8 +421,11 @@ export default {
         };
       });
 
-      // Better label than "all" — clearer for users
-      return [{ text: "All Access Points", value: "ALL_APS" }, ...formatted];
+      if (this.accessPointOptions.length >= 2) {
+        return [{ text: "ALL APs", value: "ALL_APS" }, ...formatted];
+      } else {
+        return formatted;
+      }
     },
   },
   async created() {
@@ -520,12 +523,16 @@ export default {
         //   this.cardsAP[0].value = this.connectedUsersPerAP;
         //   this.loadUsersForSelectedAP();
         // }
-      if (this.accessPointOptions.length > 0 && !this.selectedAccessPoint) {
-        this.selectedAccessPoint = "ALL_APS";
-        this.loadUsersForSelectedAP();
-      } else if (this.selectedAccessPoint) {
-        this.loadUsersForSelectedAP();
-      }
+        if (this.accessPointOptions.length) {
+          if (!this.selectedAccessPoint) {
+            if (this.accessPointOptions.length >= 2) {
+              this.selectedAccessPoint = "ALL_APS";
+            } else {
+              this.selectedAccessPoint = this.accessPointOptions[0].value;
+            }
+          }
+          this.loadUsersForSelectedAP();
+        }
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
