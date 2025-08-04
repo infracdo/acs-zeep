@@ -1,12 +1,9 @@
 <template>
-  <v-container
-    fluid
-    class="pa-5"
-  >
+  <v-container fluid class="pa-5">
     <!-- Overall Summary -->
     <v-card class="pa-4 mb-6">
       <v-card-title class="pa-0">
-        Overall RADIUS Summary 
+        Overall RADIUS Summary
       </v-card-title>
       <v-row>
         <v-col
@@ -16,18 +13,20 @@
           sm="6"
           md="4"
         >
-          <v-card
-            :style="{backgroundColor: card.color}"
-          >
+          <v-card :style="{backgroundColor: card.color}">
             <v-card-title
               class="font-weight-bold text-h3 text-right"
-              style="text-align: right; display: block; color: white;"
+              style="text-align: right; display: block; color: white"
             >
-              {{ card.value !== null && card.value !== undefined ? card.value : '-' }}
+              {{
+                card.value !== null && card.value !== undefined
+                  ? card.value
+                  : "-"
+              }}
             </v-card-title>
             <v-card-text
               class="text-right text-subtitle-2"
-              style="color: white;"
+              style="color: white"
             >
               {{ card.title }}
             </v-card-text>
@@ -38,19 +37,13 @@
 
     <!-- List of APs / Data per AP -->
     <v-card class="pa-4 mb-6">
-      <v-row
-        align="center"
-        class="ma-0"
-      >
+      <v-row align="center" class="ma-0">
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
             List of Active Users per AP
           </v-card-title>
         </v-col>
-        <v-col
-          class="pa-0"
-          cols="auto"
-        >
+        <v-col class="pa-0" cols="auto">
           <!-- NOTE: uncomment if the select options data in the future doesn't need formatting -->
           <!-- <v-select
             v-model="selectedAccessPoint"
@@ -72,7 +65,7 @@
             :items="formattedAccessPointOptions"
             item-text="text"
             item-value="value"
-            style="width: 20em;"
+            style="width: 20em"
             label="Select Access Point (AP)"
             @change="onAPChange"
           />
@@ -92,7 +85,7 @@
               hide-details
             />
           </v-card-title> -->
-          <div style="overflow-x: auto;">
+          <div style="overflow-x: auto">
             <v-data-table
               dense
               :headers="userHeaders"
@@ -120,10 +113,7 @@
 
     <!-- List of Online APs -->
     <v-card class="pa-4 mb-6">
-      <v-row
-        align="center"
-        class="ma-0"
-      >
+      <v-row align="center" class="ma-0">
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
             List of Active APs in ACS
@@ -156,18 +146,20 @@
             sm="6"
             md="4"
           >
-            <v-card
-              :style="{backgroundColor: card.color}"
-            >
+            <v-card :style="{backgroundColor: card.color}">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
-                style="text-align: right; display: block; color: white;"
+                style="text-align: right; display: block; color: white"
               >
-                {{ card.value !== null && card.value !== undefined ? card.value : '-' }}
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
               </v-card-title>
               <v-card-text
                 class="text-right text-subtitle-2"
-                style="color: white;"
+                style="color: white"
               >
                 {{ card.title }}
               </v-card-text>
@@ -188,7 +180,7 @@
               hide-details
             />
           </v-card-title> -->
-          <div style="overflow-x: auto;">
+          <div style="overflow-x: auto">
             <v-data-table
               dense
               :headers="apHeaders"
@@ -212,11 +204,11 @@
               </template>
 
               <template v-slot:item.acctinputoctets="{item}">
-                {{ item.acctinputoctets ?? '-' }}
+                {{ item.acctinputoctets ?? "-" }}
               </template>
 
               <template v-slot:item.acctoutputoctets="{item}">
-                {{ item.acctoutputoctets ?? '-' }}
+                {{ item.acctoutputoctets ?? "-" }}
               </template>
             </v-data-table>
           </div>
@@ -227,56 +219,56 @@
 </template>
 
 <script>
-import ApiService from '../../api.service';
+import ApiService from "../../api.service";
 
 export default {
-  name: 'MonitoringDashboard',
+  name: "MonitoringDashboard",
   data() {
     return {
       cardsOverallSummary: [
         {
-          title: 'Active RADIUS Users',
-          value: '-',
-          color: '#66BB6A',
-          key: 'connectedUsers',
+          title: "Active RADIUS Users",
+          value: "-",
+          color: "#66BB6A",
+          key: "connectedUsers",
         },
         {
-          title: 'Active APs in RADIUS',
-          value: '-',
-          color: '#4DB6AC',
-          key: 'connectedAPs',
+          title: "Active APs in RADIUS",
+          value: "-",
+          color: "#4DB6AC",
+          key: "connectedAPs",
         },
         {
-          title: 'Current RADIUS Sessions',
-          value: '-',
-          color: '#FFB74D',
-          key: 'totalUserConnectionsToday',
+          title: "Current RADIUS Sessions",
+          value: "-",
+          color: "#FFB74D",
+          key: "totalUserConnectionsToday",
         },
         {
-          title: 'Total AP Bandwidth Usage',
-          value: '-',
-          color: '#FDD835',
-          key: 'totalBandwidthConsumptionToday',
+          title: "Total AP Bandwidth Usage",
+          value: "-",
+          color: "#FDD835",
+          key: "totalBandwidthConsumptionToday",
         },
         {
-          title: 'Average Session Duration',
-          value: '-',
-          color: '#1E88E5',
-          key: 'averageConnectionTime',
+          title: "Average Session Duration",
+          value: "-",
+          color: "#1E88E5",
+          key: "averageConnectionTime",
         },
         {
-          title: 'Average Bandwidth per Session',
-          value: '-',
-          color: '#E57373',
-          key: 'averageBandwidthPerConnection',
+          title: "Average Bandwidth per Session",
+          value: "-",
+          color: "#E57373",
+          key: "averageBandwidthPerConnection",
         },
       ],
       cardsAP: [
         {
-          title: 'Active APs in ACS',
-          value: '-',
-          color: '#4DB6AC',
-          key: 'allConnectedAPData',
+          title: "Active APs in ACS",
+          value: "-",
+          color: "#4DB6AC",
+          key: "allConnectedAPData",
         },
       ],
       // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -332,78 +324,78 @@ export default {
       // ],
       userHeaders: [
         {
-          text: 'Username',
-          align: 'start',
+          text: "Username",
+          align: "start",
           sortable: true,
-          value: 'username',
+          value: "username",
         },
         {
-          text: 'Account Input Octets',
-          align: 'start',
+          text: "Account Input Octets",
+          align: "start",
           sortable: true,
-          value: 'acctinputoctets',
+          value: "acctinputoctets",
         },
         {
-          text: 'Account Output Octets',
-          align: 'start',
+          text: "Account Output Octets",
+          align: "start",
           sortable: true,
-          value: 'acctoutputoctets',
+          value: "acctoutputoctets",
         },
         {
-          text: 'NAS Port',
-          align: 'start',
+          text: "NAS Port",
+          align: "start",
           sortable: false,
-          value: 'nasport',
+          value: "nasport",
         },
         {
-          text: 'Calling Station ID',
-          align: 'start',
+          text: "Calling Station ID",
+          align: "start",
           sortable: true,
-          value: 'calling_station_id',
+          value: "calling_station_id",
         },
         {
-          text: 'Timestamp',
-          align: 'start',
+          text: "Timestamp",
+          align: "start",
           sortable: true,
-          value: 'timestamp',
+          value: "timestamp",
         },
       ],
       apHeaders: [
         {
-          text: 'Serial Number',
-          align: 'start',
+          text: "Serial Number",
+          align: "start",
           sortable: true,
-          value: 'serial_number',
+          value: "serial_number",
         },
         {
-          text: 'Device Name',
-          align: 'start',
+          text: "Device Name",
+          align: "start",
           sortable: true,
-          value: 'device_name',
+          value: "device_name",
         },
         {
-          text: 'Mac Address',
-          align: 'start',
+          text: "Mac Address",
+          align: "start",
           sortable: true,
-          value: 'mac_address',
+          value: "mac_address",
         },
         {
-          text: 'Status',
-          align: 'start',
+          text: "Status",
+          align: "start",
           sortable: true,
-          value: 'status',
+          value: "status",
         },
         {
-          text: 'Group',
-          align: 'start',
+          text: "Group",
+          align: "start",
           sortable: true,
-          value: 'parent',
+          value: "parent",
         },
         {
-          text: 'Date Created',
-          align: 'start',
+          text: "Date Created",
+          align: "start",
           sortable: true,
-          value: 'date_created',
+          value: "date_created",
         },
       ],
       connectedUsersPerAP: 0,
@@ -420,14 +412,17 @@ export default {
   },
   computed: {
     formattedAccessPointOptions() {
-      return this.accessPointOptions.map((item) => {
-        const [macRaw, name] = item.value.split(':');
+      const formatted = this.accessPointOptions.map((item) => {
+        const [macRaw, name] = item.value.split(":");
         const formattedMac = this.formatMacAddress(macRaw);
         return {
           text: `${formattedMac} - ${name}`,
           value: item.value,
         };
       });
+
+      // Better label than "all" — clearer for users
+      return [{ text: "All Access Points", value: "ALL_APS" }, ...formatted];
     },
   },
   async created() {
@@ -472,21 +467,29 @@ export default {
         ]);
 
         // Update overall summary cards
-        this.cardsOverallSummary[0].value = countConnectedUsersResponse.data.currentlyConnectedUsers;
-        this.cardsOverallSummary[1].value = countConnectedAPsResponse.data.currentlyConnectedAPs;
-        this.cardsOverallSummary[2].value = totalUserConnectionsTodayResponse.data.totalUserConnectionsToday;
-        this.cardsOverallSummary[3].value = totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
-        this.cardsOverallSummary[4].value = avgConnectionTimeResponse.data.averageConnectionTime;
-        this.cardsOverallSummary[5].value = avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
+        this.cardsOverallSummary[0].value =
+          countConnectedUsersResponse.data.currentlyConnectedUsers;
+        this.cardsOverallSummary[1].value =
+          countConnectedAPsResponse.data.currentlyConnectedAPs;
+        this.cardsOverallSummary[2].value =
+          totalUserConnectionsTodayResponse.data.totalUserConnectionsToday;
+        this.cardsOverallSummary[3].value =
+          totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
+        this.cardsOverallSummary[4].value =
+          avgConnectionTimeResponse.data.averageConnectionTime;
+        this.cardsOverallSummary[5].value =
+          avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
 
-        this.cardsAP[0].value = countConnectedAPsResponse.data.currentlyConnectedAPs;
+        this.cardsAP[0].value =
+          countConnectedAPsResponse.data.currentlyConnectedAPs;
 
         // Convert array to map
         this.connectedUsersPerAPMap = {};
         countConnectedUsersPerApResponse.data.forEach((item) => {
           // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
           // this.connectedUsersPerAPMap[item.apMacAddress] = item.userCount;
-          this.connectedUsersPerAPMap[item.calledStationId] = item.currentlyConnectedUsers;
+          this.connectedUsersPerAPMap[item.calledStationId] =
+            item.currentlyConnectedUsers;
         });
 
         // Store all connected users data
@@ -502,10 +505,12 @@ export default {
         //   text: ap,
         //   value: ap,
         // }));
-        this.accessPointOptions = accessPointsResponse.data.accessPoints.map((ap) => ({
-          text: ap,
-          value: ap,
-        }));
+        this.accessPointOptions = accessPointsResponse.data.accessPoints.map(
+          (ap) => ({
+            text: ap,
+            value: ap,
+          })
+        );
 
         // Pre-select the first access point
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -515,12 +520,14 @@ export default {
         //   this.cardsAP[0].value = this.connectedUsersPerAP;
         //   this.loadUsersForSelectedAP();
         // }
-        if (this.accessPointOptions.length > 0) {
-          this.selectedAccessPoint = this.accessPointOptions[0].value;
-          this.loadUsersForSelectedAP();
-        }
+      if (this.accessPointOptions.length > 0 && !this.selectedAccessPoint) {
+        this.selectedAccessPoint = "ALL_APS";
+        this.loadUsersForSelectedAP();
+      } else if (this.selectedAccessPoint) {
+        this.loadUsersForSelectedAP();
+      }
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        console.error("Error fetching data: ", error);
       } finally {
         this.loading = false;
       }
@@ -530,40 +537,45 @@ export default {
       this.loadUsersForSelectedAP();
     },
     loadUsersForSelectedAP() {
-      if (!this.selectedAccessPoint) return;
-      // Update the count of connected users
-      this.connectedUsersPerAP = this.connectedUsersPerAPMap[this.selectedAccessPoint] || 0;
-      // this.cardsAP[0].value = this.connectedUsersPerAP;
-      // Find the AP data in allConnectedUsersData
-      const apData = this.allConnectedUsersData.find(
-        // (ap) => ap.apMacAddress === this.selectedAccessPoint, // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
-        (ap) => ap.called_station_id === this.selectedAccessPoint,
-      );
-      // Update the connected users table data
-      // this.connectedUsers = apData ? apData.connectedUsers : []; // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
-      this.connectedUsers = apData?.currently_connected_users?.map((user) => ({
+  if (!this.selectedAccessPoint) return;
+
+  if (this.selectedAccessPoint === 'ALL_APS') {
+    this.connectedUsers = this.allConnectedUsersData.flatMap((ap) =>
+      ap.currently_connected_users?.map((user) => ({
+        ...user,
+        timestamp: Number(user.timestamp) || null,
+      })) || []
+    );
+  } else {
+    const apData = this.allConnectedUsersData.find(
+      (ap) => ap.called_station_id === this.selectedAccessPoint
+    );
+    this.connectedUsers =
+      apData?.currently_connected_users?.map((user) => ({
         ...user,
         timestamp: Number(user.timestamp) || null,
       })) || [];
-    },
+  }
+}
+,
     formatTimestamp(timestamp) {
-      if (!timestamp) return 'N/A';
+      if (!timestamp) return "N/A";
       const date = new Date(timestamp * 1000);
 
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
 
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
 
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
     formatMacAddress(mac) {
-      if (!mac) return '';
-      const cleaned = mac.replace(/[^a-fA-F0-9]/g, '').toUpperCase();
-      return cleaned.match(/.{1,2}/g)?.join(':') || mac;
+      if (!mac) return "";
+      const cleaned = mac.replace(/[^a-fA-F0-9]/g, "").toUpperCase();
+      return cleaned.match(/.{1,2}/g)?.join(":") || mac;
     },
   },
 };
