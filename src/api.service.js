@@ -43,13 +43,29 @@ class ApiService {
   getCountCurrentlyConnectedUsers() {
     return http.get('/api/radius/count-currently-connected-users');
   }
+  
+  getCountTotalUsers() {
+    return http.get('/api/radius/count-total-users');
+  }
 
   getCountCurrentlyConnectedAPs() {
     return http.get('/api/radius/count-currently-connected-aps');
   }
 
   getTotalUserConnectionsToday() {
-    return http.get('/api/radius/total-user-connections-today');
+    return http.get('/api/radius/total-active-aps');
+  }
+
+  getCountTotalActiveAPs() {
+    return http.get('/api/radius/count-total-aps');
+  }
+
+  getTotalSessionTimeToday() {
+    return http.get('/api/radius/total-session-time-today');
+  }
+
+  getTotalUserSessionsToday() {
+    return http.get('/api/radius/total-user-sessions-today');
   }
 
   getTotalBandwidthConsumptionToday() {
@@ -76,8 +92,12 @@ class ApiService {
     return http.get('/api/radius/access-points');
   }
   
-  getAccessPointsInfo() {
-    return http.get('/api/radius/access-points-info');
+  getAccessPointsOnline() {
+    return http.get('/api/radius/access-points-online');
+  }
+
+  getAccessPointsAll() {
+    return http.get('/api/radius/access-points-all');
   }
   
 }
