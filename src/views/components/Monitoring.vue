@@ -2,37 +2,141 @@
   <v-container fluid class="pa-5">
     <!-- Overall Summary -->
     <v-card class="pa-4 mb-6">
-      <v-card-title class="pa-0">
-        Overall RADIUS Summary
+      <v-card-title class="pa-0 pb-2 text-h5">
+        Overall Summary
       </v-card-title>
-      <v-row>
-        <v-col
-          v-for="(card, index) in cardsOverallSummary"
-          :key="index"
-          cols="12"
-          sm="6"
-          md="4"
-        >
-          <v-card :style="{backgroundColor: card.color}">
-            <v-card-title
-              class="font-weight-bold text-h3 text-right"
-              style="text-align: right; display: block; color: white"
-            >
-              {{
-                card.value !== null && card.value !== undefined
-                  ? card.value
-                  : "-"
-              }}
-            </v-card-title>
-            <v-card-text
-              class="text-right text-subtitle-2"
-              style="color: white"
-            >
-              {{ card.title }}
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+      <v-card class="pa-4 elevation-0">
+        <v-card-title class="pa-0 pb-2">
+          User Insights
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsUsers"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-card class="pa-4 elevation-0">
+        <v-card-title class="pa-0 pb-2">
+          AP Insights
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsAP"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-card class="pa-4 elevation-0">
+        <v-card-title class="pa-0 pb-2">
+          Today’s Overview
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsTotal"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-card class="pa-4 elevation-0">
+        <v-card-title class="pa-0 pb-2">
+          Cumulative Averages
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsAvg"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card>
     </v-card>
 
     <!-- List of APs / Data per AP -->
@@ -40,7 +144,7 @@
       <v-row align="center" class="ma-0">
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
-            List of Active Users per AP
+            List of Online Users per AP
           </v-card-title>
         </v-col>
         <v-col class="pa-0" cols="auto">
@@ -116,7 +220,7 @@
       <v-row align="center" class="ma-0">
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
-            List of Active APs in ACS
+            List of Online APs
           </v-card-title>
         </v-col>
         <!-- <v-col
@@ -138,9 +242,9 @@
         </v-col> -->
       </v-row>
       <v-col class="pa-0">
-        <v-row>
+        <v-row class="mb-2">
           <v-col
-            v-for="(card, index) in cardsAP"
+            v-for="(card, index) in cardsACS"
             :key="index"
             cols="12"
             sm="6"
@@ -225,49 +329,79 @@ export default {
   name: "MonitoringDashboard",
   data() {
     return {
-      cardsOverallSummary: [
+      cardsUsers: [
         {
-          title: "Active RADIUS Users",
+          title: "Current Online Users",
           value: "-",
           color: "#66BB6A",
           key: "connectedUsers",
         },
         {
-          title: "Active APs in RADIUS",
+          title: "Total Active Users",
           value: "-",
-          color: "#4DB6AC",
-          key: "connectedAPs",
-        },
-        {
-          title: "Current RADIUS Sessions",
-          value: "-",
-          color: "#FFB74D",
-          key: "totalUserConnectionsToday",
-        },
-        {
-          title: "Total AP Bandwidth Usage",
-          value: "-",
-          color: "#FDD835",
-          key: "totalBandwidthConsumptionToday",
-        },
-        {
-          title: "Average Session Duration",
-          value: "-",
-          color: "#1E88E5",
-          key: "averageConnectionTime",
-        },
-        {
-          title: "Average Bandwidth per Session",
-          value: "-",
-          color: "#E57373",
-          key: "averageBandwidthPerConnection",
+          color: "#336951",
+          key: "totalUsers",
         },
       ],
       cardsAP: [
         {
-          title: "Active APs in ACS",
+          title: "Current Online APs",
           value: "-",
-          color: "#4DB6AC",
+          color: "#75C6A6",
+          key: "connectedAPs",
+        },
+        {
+          title: "Total Active APs",
+          value: "-",
+          color: "#135959",
+          key: "allConnectedAPData",
+        },
+      ],
+      cardsTotal: [
+        {
+          title: "Total Bandwidth Usage",
+          value: "-",
+          color: "#8BAEEA",
+          key: "totalBandwidthConsumptionToday",
+        },
+        {
+          title: "Total Session Time",
+          value: "-",
+          color: "#E7A877",
+          key: "totalBandwidthConsumptionToday",
+        },
+        {
+          title: "Total User Sessions",
+          value: "-",
+          color: "#C7B28B",
+          key: "totalUserSessionsToday",
+        },
+      ],
+      cardsAvg: [
+        {
+          title: "Average Bandwidth Usage",
+          value: "-",
+          color: "#18346B",
+          key: "averageBandwidthPerConnection",
+        },
+        {
+          title: "Average Session Time",
+          value: "-",
+          color: "#6D2E1B",
+          key: "averageConnectionTime",
+        },
+      ],
+      cardsACS: [
+        {
+          title: "Online APs",
+          value: "-",
+          color: "#6B6580",
+          key: "allConnectedAPData",
+        },
+        {
+          title: "Total APs",
+          value: "-",
+          color: "#4C4F64",
           key: "allConnectedAPData",
         },
       ],
@@ -445,46 +579,78 @@ export default {
         this.loading = true;
 
         // Fetch all data in parallel
-        const [
-          countConnectedUsersResponse,
-          countConnectedAPsResponse,
-          totalUserConnectionsTodayResponse,
-          totalBandwidthConsumptionTodayResponse,
-          avgConnectionTimeResponse,
-          avgBandwidthConnectionResponse,
+        const [ // user insights
+          countConnectedUsersResponse, // current online users
+          countTotalUsersResponse, // total active users
+        ] = await Promise.all([
+          ApiService.getCountCurrentlyConnectedUsers(),
+          ApiService.getCountTotalUsers(),
+        ]);
+
+        const [ // ap insights
+          countConnectedAPsResponse, // current online aps
+          countActiveAPsResponse, // total active aps
+        ] = await Promise.all([
+          ApiService.getCountCurrentlyConnectedAPs(),
+          ApiService.getCountTotalActiveAPs(),
+        ]);
+
+        const [ // today's overview
+          totalBandwidthConsumptionTodayResponse, // total bandwidth usage
+          totalSessionTimeTodayResponse, // total session time
+          totalUserSessionsTodayResponse, // total user sessions
+        ] = await Promise.all([
+          ApiService.getTotalBandwidthConsumptionToday(),
+          ApiService.getTotalSessionTimeToday(),
+          ApiService.getTotalUserSessionsToday(),
+        ]);
+        
+        const [ // cumulative averages
+          avgBandwidthConnectionResponse, // average bandwidth usage
+          avgConnectionTimeResponse, // average session time
+        ] = await Promise.all([
+          ApiService.getAverageBandwidthPerConnection(),
+          ApiService.getAverageConnectionTime(),
+        ]);
+
+        const [ // acs aps
+          accessPointsOnlineResponse, // online aps
+          accessPointsAllResponse, // online aps
+        ] = await Promise.all([
+          ApiService.getAccessPointsOnline(),
+          ApiService.getAccessPointsAll(),
+        ]);
+
+        const [ // tables
           countConnectedUsersPerApResponse,
           connectedUsersPerApResponse,
           accessPointsResponse,
-          accessPointsInfoResponse,
         ] = await Promise.all([
-          ApiService.getCountCurrentlyConnectedUsers(),
-          ApiService.getCountCurrentlyConnectedAPs(),
-          ApiService.getTotalUserConnectionsToday(),
-          ApiService.getTotalBandwidthConsumptionToday(),
-          ApiService.getAverageConnectionTime(),
-          ApiService.getAverageBandwidthPerConnection(),
           ApiService.getCountCurrentlyConnectedUsersPerAP(),
           ApiService.getCurrentlyConnectedUsersPerAP(),
           ApiService.getAccessPoints(),
-          ApiService.getAccessPointsInfo(),
         ]);
 
         // Update overall summary cards
-        this.cardsOverallSummary[0].value =
+        this.cardsUsers[0].value =
           countConnectedUsersResponse.data.currentlyConnectedUsers;
-        this.cardsOverallSummary[1].value =
-          countConnectedAPsResponse.data.currentlyConnectedAPs;
-        this.cardsOverallSummary[2].value =
-          totalUserConnectionsTodayResponse.data.totalUserConnectionsToday;
-        this.cardsOverallSummary[3].value =
-          totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
-        this.cardsOverallSummary[4].value =
-          avgConnectionTimeResponse.data.averageConnectionTime;
-        this.cardsOverallSummary[5].value =
-          avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
+        this.cardsUsers[1].value = countTotalUsersResponse.data.totalUsers;
 
         this.cardsAP[0].value =
           countConnectedAPsResponse.data.currentlyConnectedAPs;
+        this.cardsAP[1].value = countActiveAPsResponse.data.totalAPs;
+
+        this.cardsTotal[0].value =
+          totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
+        this.cardsTotal[1].value =
+          totalSessionTimeTodayResponse.data.totalSessionTimeToday;
+        this.cardsTotal[2].value =
+          totalUserSessionsTodayResponse.data.totalUserSessionsToday;
+
+        this.cardsAvg[0].value =
+          avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
+        this.cardsAvg[1].value =
+          avgConnectionTimeResponse.data.averageConnectionTime;
 
         // Convert array to map
         this.connectedUsersPerAPMap = {};
@@ -498,8 +664,10 @@ export default {
         // Store all connected users data
         this.allConnectedUsersData = connectedUsersPerApResponse.data;
 
-        this.allConnectedAPData = accessPointsInfoResponse.data;
-        this.cardsAP[0].value = this.allConnectedAPData.length;
+        this.allConnectedAPData = accessPointsOnlineResponse.data;
+
+        this.cardsACS[0].value = this.allConnectedAPData.length;
+        this.cardsACS[1].value = accessPointsAllResponse.data.length;
 
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -544,27 +712,27 @@ export default {
       this.loadUsersForSelectedAP();
     },
     loadUsersForSelectedAP() {
-  if (!this.selectedAccessPoint) return;
+      if (!this.selectedAccessPoint) return;
 
-  if (this.selectedAccessPoint === 'ALL_APS') {
-    this.connectedUsers = this.allConnectedUsersData.flatMap((ap) =>
-      ap.currently_connected_users?.map((user) => ({
-        ...user,
-        timestamp: Number(user.timestamp) || null,
-      })) || []
-    );
-  } else {
-    const apData = this.allConnectedUsersData.find(
-      (ap) => ap.called_station_id === this.selectedAccessPoint
-    );
-    this.connectedUsers =
-      apData?.currently_connected_users?.map((user) => ({
-        ...user,
-        timestamp: Number(user.timestamp) || null,
-      })) || [];
-  }
-}
-,
+      if (this.selectedAccessPoint === "ALL_APS") {
+        this.connectedUsers = this.allConnectedUsersData.flatMap(
+          (ap) =>
+            ap.currently_connected_users?.map((user) => ({
+              ...user,
+              timestamp: Number(user.timestamp) || null,
+            })) || []
+        );
+      } else {
+        const apData = this.allConnectedUsersData.find(
+          (ap) => ap.called_station_id === this.selectedAccessPoint
+        );
+        this.connectedUsers =
+          apData?.currently_connected_users?.map((user) => ({
+            ...user,
+            timestamp: Number(user.timestamp) || null,
+          })) || [];
+      }
+    },
     formatTimestamp(timestamp) {
       if (!timestamp) return "N/A";
       const date = new Date(timestamp * 1000);
