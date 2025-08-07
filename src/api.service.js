@@ -72,12 +72,12 @@ class ApiService {
     return http.get('/api/radius/total-bandwidth-consumption-today');
   }
 
-  getAverageConnectionTime() {
-    return http.get('/api/radius/average-connection-time');
+  getAverageConnectionTimeForMonth() {
+    return http.get('/api/radius/average-connection-time-for-month');
   }
 
-  getAverageBandwidthPerConnection() {
-    return http.get('/api/radius/average-bandwidth-per-connection');
+  getAverageBandwidthForMonth() {
+    return http.get('/api/radius/average-bandwidth-for-month');
   }
 
   getCountCurrentlyConnectedUsersPerAP() {
