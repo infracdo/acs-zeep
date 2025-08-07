@@ -70,6 +70,34 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsACS"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-card>
       <v-card class="pa-4 elevation-0">
         <v-card-title class="pa-0 pb-2">
@@ -242,35 +270,6 @@
         </v-col> -->
       </v-row>
       <v-col class="pa-0">
-        <v-row class="mb-2">
-          <v-col
-            v-for="(card, index) in cardsACS"
-            :key="index"
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-card :style="{backgroundColor: card.color}">
-              <v-card-title
-                class="font-weight-bold text-h3 text-right"
-                style="text-align: right; display: block; color: white"
-              >
-                {{
-                  card.value !== null && card.value !== undefined
-                    ? card.value
-                    : "-"
-                }}
-              </v-card-title>
-              <v-card-text
-                class="text-right text-subtitle-2"
-                style="color: white"
-              >
-                {{ card.title }}
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-
         <!-- Table for list of currently connected users per access point -->
         <v-card class="mt-3">
           <!-- <v-card-title>
@@ -353,7 +352,21 @@ export default {
         {
           title: "Total Active APs",
           value: "-",
-          color: "#135959",
+          color: "#166A6A",
+          key: "allConnectedAPData",
+        },
+      ],
+      cardsACS: [
+        {
+          title: "Online APs",
+          value: "-",
+          color: "#4B8F78",
+          key: "allConnectedAPData",
+        },
+        {
+          title: "Total APs",
+          value: "-",
+          color: "#0E3C3C",
           key: "allConnectedAPData",
         },
       ],
@@ -389,20 +402,6 @@ export default {
           value: "-",
           color: "#6D2E1B",
           key: "averageConnectionTime",
-        },
-      ],
-      cardsACS: [
-        {
-          title: "Online APs",
-          value: "-",
-          color: "#6B6580",
-          key: "allConnectedAPData",
-        },
-        {
-          title: "Total APs",
-          value: "-",
-          color: "#4C4F64",
-          key: "allConnectedAPData",
         },
       ],
       // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -537,6 +536,7 @@ export default {
       connectedUsers: [],
       allConnectedUsersData: [],
       allConnectedAPData: [],
+      totalAPData: [],
       currentConnectedAPs: [],
       accessPointOptions: [],
       selectedAccessPoint: null,
@@ -609,8 +609,8 @@ export default {
           avgBandwidthConnectionResponse, // average bandwidth usage
           avgConnectionTimeResponse, // average session time
         ] = await Promise.all([
-          ApiService.getAverageBandwidthPerConnection(),
-          ApiService.getAverageConnectionTime(),
+          ApiService.getAverageBandwidthForMonth(),
+          ApiService.getAverageConnectionTimeForMonth(),
         ]);
 
         const [ // acs aps
@@ -648,9 +648,9 @@ export default {
           totalUserSessionsTodayResponse.data.totalUserSessionsToday;
 
         this.cardsAvg[0].value =
-          avgBandwidthConnectionResponse.data.averageBandwidthPerConnection;
+          avgBandwidthConnectionResponse.data.averageBandwidthForMonth;
         this.cardsAvg[1].value =
-          avgConnectionTimeResponse.data.averageConnectionTime;
+          avgConnectionTimeResponse.data.averageConnectionTimeForMonth;
 
         // Convert array to map
         this.connectedUsersPerAPMap = {};
@@ -665,9 +665,10 @@ export default {
         this.allConnectedUsersData = connectedUsersPerApResponse.data;
 
         this.allConnectedAPData = accessPointsOnlineResponse.data;
+        this.totalAPData = accessPointsAllResponse.data;
 
         this.cardsACS[0].value = this.allConnectedAPData.length;
-        this.cardsACS[1].value = accessPointsAllResponse.data.length;
+        this.cardsACS[1].value = this.totalAPData.length;
 
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
