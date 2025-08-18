@@ -87,6 +87,14 @@ class ApiService {
   getCurrentlyConnectedUsersPerAP() {
     return http.get('/api/radius/currently-connected-users-per-ap');
   }
+  
+  getAPDeviceName(mac) {
+    return http.get('/api/radius/ap-device-name', {
+      params: {
+        mac: mac
+      }
+    });
+  }
 
   getAccessPoints() {
     return http.get('/api/radius/access-points');
