@@ -567,8 +567,11 @@ export default {
           if (!item.value.includes(':')) { // if station id does not contain colon then it is a lowercased mac
             try {
               mac = this.formatMacAddress(item.value); // format lowercased mac 
-              const response = await ApiService.getAPDeviceName(item.value); // get device name of ap from mac
+              const response = await ApiService.getAPDeviceName(mac); // get device name of ap from mac
               name = response.data.deviceName;
+              if (!name) {
+                name = 'No Device Name';
+              }
             } catch {
               name = 'No Device Name';
             }
