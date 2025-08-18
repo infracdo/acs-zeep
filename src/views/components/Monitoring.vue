@@ -539,28 +539,11 @@ export default {
       totalAPData: [],
       currentConnectedAPs: [],
       accessPointOptions: [],
+      formattedAccessPointOptions: [],
       selectedAccessPoint: null,
       loading: false,
       fetchInterval: null,
     };
-  },
-  computed: {
-    formattedAccessPointOptions() {
-      const formatted = this.accessPointOptions.map((item) => {
-        const [macRaw, name] = item.value.split(":");
-        const formattedMac = this.formatMacAddress(macRaw);
-        return {
-          text: `${formattedMac} - ${name}`,
-          value: item.value,
-        };
-      });
-
-      if (this.accessPointOptions.length >= 2) {
-        return [{ text: "ALL APs", value: "ALL_APS" }, ...formatted];
-      } else {
-        return formatted;
-      }
-    },
   },
   async created() {
     await this.fetchData();
@@ -574,6 +557,44 @@ export default {
     clearInterval(this.fetchInterval);
   },
   methods: {
+    async loadFormattedAccessPointOptions() {
+      const formatted = await Promise.all(
+        this.accessPointOptions.map(async (item) => {
+          let mac = item.value;
+          let name = '';
+
+          // Only get device name if MAC address doesn't contain colon
+          if (!item.value.includes(':')) { // if station id does not contain colon then it is a lowercased mac
+            try {
+              mac = this.formatMacAddress(item.value); // format lowercased mac 
+              const response = await ApiService.getAPDeviceName(item.value); // get device name of ap from mac
+              name = response.data.deviceName;
+            } catch {
+              name = 'No Device Name';
+            }
+          } else { // if it contains a colon then it has ssid
+            const [macRaw, ssid] = item.value.split(":");
+            mac = this.formatMacAddress(macRaw); // format mac address
+            name = ssid;
+          }
+
+          return {
+            text: `${mac} - ${name}`,
+            value: item.value,
+          };
+        })
+      );
+
+      // Add ALL_APS option if there are 2 or more APs
+      if (this.accessPointOptions.length >= 2) {
+        this.formattedAccessPointOptions = [
+          { text: 'ALL APs', value: 'ALL_APS' },
+          ...formatted,
+        ];
+      } else {
+        this.formattedAccessPointOptions = formatted;
+      }
+    },
     async fetchData() {
       try {
         this.loading = true;
@@ -684,6 +705,7 @@ export default {
           })
         );
 
+        await this.loadFormattedAccessPointOptions();
         // Pre-select the first access point
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
         // if (this.accessPointOptions.length > 0) {
