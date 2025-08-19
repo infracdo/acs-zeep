@@ -195,6 +195,7 @@
             solo-inverted
             hide-details
             :items="formattedAccessPointOptions"
+            :disabled="isAccessPointDropdownDisabled"
             item-text="text"
             item-value="value"
             style="width: 20em"
@@ -533,6 +534,14 @@ export default {
       fetchInterval: null,
     };
   },
+  computed: {
+    isAccessPointDropdownDisabled() {
+      return (
+        !this.accessPointOptions.length ||
+        (this.accessPointOptions.length === 1 && this.accessPointOptions[0].value === null)
+      );
+    },
+  },
   async created() {
     await this.fetchData();
 
@@ -548,6 +557,9 @@ export default {
     async loadFormattedAccessPointOptions() {
       const formatted = await Promise.all(
         this.accessPointOptions.map(async (item) => {
+          if (!item.value) {
+            return item;
+          }
           let mac = item.value;
           let name = '';
 
@@ -689,12 +701,20 @@ export default {
         //   text: ap,
         //   value: ap,
         // }));
-        this.accessPointOptions = accessPointsResponse.data.accessPoints.map(
-          (ap) => ({
-            text: ap,
-            value: ap,
-          })
-        );
+        const aps = accessPointsResponse.data.accessPoints || [];
+
+        if (aps.length === 0) {
+          this.accessPointOptions = [{ text: 'NO ACTIVE APS FOUND', value: null }];
+          this.selectedAccessPoint = null;
+        } else {
+          this.accessPointOptions = aps
+            .filter(ap => ap != null)
+            .map(ap => ({ text: ap, value: ap }));
+
+          if (!this.selectedAccessPoint) {
+            this.selectedAccessPoint = aps.length >= 2 ? 'ALL_APS' : aps[0];
+          }
+        }
 
         await this.loadFormattedAccessPointOptions();
         // Pre-select the first access point
