@@ -172,7 +172,7 @@
       <v-row align="center" class="ma-0">
         <v-col class="pa-0">
           <v-card-title class="pa-0 mb-3">
-            List of Online Users per AP
+            List of Online Users per Active AP
           </v-card-title>
         </v-col>
         <v-col class="pa-0" cols="auto">
@@ -739,25 +739,46 @@ export default {
     },
     loadUsersForSelectedAP() {
       if (!this.selectedAccessPoint) return;
+      const uniqueUsersMap = new Map();
 
       if (this.selectedAccessPoint === "ALL_APS") {
-        this.connectedUsers = this.allConnectedUsersData.flatMap(
-          (ap) =>
-            ap.currently_connected_users?.map((user) => ({
-              ...user,
-              timestamp: Number(user.timestamp) || null,
-            })) || []
-        );
+        for (const ap of this.allConnectedUsersData) {
+          const apId = ap.called_station_id;
+
+          const perAPUserMap = new Map();
+
+          for (const user of ap.currently_connected_users || []) {
+            const key = user.username || user.calling_station_id;
+            if (key && !perAPUserMap.has(key)) {
+              perAPUserMap.set(key, {
+                ...user,
+                timestamp: Number(user.timestamp) || null,
+                called_station_id: apId, 
+              });
+            }
+          }
+
+          for (const [key, user] of perAPUserMap) {
+            uniqueUsersMap.set(`${key}_${apId}`, user);
+          }
+        }
       } else {
         const apData = this.allConnectedUsersData.find(
-          (ap) => ap.called_station_id === this.selectedAccessPoint
+          ap => ap.called_station_id === this.selectedAccessPoint
         );
-        this.connectedUsers =
-          apData?.currently_connected_users?.map((user) => ({
-            ...user,
-            timestamp: Number(user.timestamp) || null,
-          })) || [];
+        const apUsers = apData?.currently_connected_users?.map(user => ({
+          ...user,
+          timestamp: Number(user.timestamp) || null,
+        })) || [];
+
+        for (const user of apUsers) {
+          const key = user.username || user.calling_station_id;
+          if (key && !uniqueUsersMap.has(key)) {
+            uniqueUsersMap.set(key, user);
+          }
+        }
       }
+      this.connectedUsers = Array.from(uniqueUsersMap.values());
     },
     formatTimestamp(timestamp) {
       if (!timestamp) return "N/A";
