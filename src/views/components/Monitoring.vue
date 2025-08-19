@@ -229,13 +229,21 @@
               class="header-nowrap"
             >
               <!-- Format Date Created column -->
-              <template v-slot:item.date_created="{item}">
-                {{ formatTimestamp(item.date_created) }}
+              <template v-slot:item.timestamp="{item}">
+                {{ formatTimestamp(item.timestamp) }}
               </template>
 
               <!-- Format MAC address -->
-              <template v-slot:item.mac_address="{item}">
-                {{ formatMacAddress(item.mac_address) }}
+              <template v-slot:item.calling_station_id="{item}">
+                {{ formatMacAddress(item.calling_station_id) }}
+              </template>
+
+              <template v-slot:item.acctinputoctets="{item}">
+                {{ item.acctinputoctets ?? "-" }}
+              </template>
+
+              <template v-slot:item.acctoutputoctets="{item}">
+                {{ item.acctoutputoctets ?? "-" }}
               </template>
             </v-data-table>
           </div>
@@ -293,27 +301,7 @@
               loading-text="Loading... Please wait"
               style="min-width: 1000px"
               class="header-nowrap"
-            >
-              <template v-slot:item.bandwidthMB="{item}">
-                {{ item.bandwidthMB }}
-              </template>
-
-              <template v-slot:item.timestamp="{item}">
-                {{ formatTimestamp(item.date_created) }}
-              </template>
-
-              <template v-slot:item.calling_station_id="{item}">
-                {{ formatMacAddress(item.calling_station_id) }}
-              </template>
-
-              <template v-slot:item.acctinputoctets="{item}">
-                {{ item.acctinputoctets ?? "-" }}
-              </template>
-
-              <template v-slot:item.acctoutputoctets="{item}">
-                {{ item.acctoutputoctets ?? "-" }}
-              </template>
-            </v-data-table>
+            />
           </div>
         </v-card>
       </v-col>
@@ -739,45 +727,43 @@ export default {
     },
     loadUsersForSelectedAP() {
       if (!this.selectedAccessPoint) return;
+
       const uniqueUsersMap = new Map();
 
+      // Helper to add users uniquely by username or MAC
+      const addUniqueUsers = (users, apId = null, map = uniqueUsersMap) => {
+        const seenUsers = new Set();
+
+        for (const user of users || []) {
+          const key = user.username || user.calling_station_id;
+          if (!key || seenUsers.has(key)) continue;
+
+          seenUsers.add(key);
+          map.set(apId ? `${key}_${apId}` : key, {
+            ...user,
+            timestamp: Number(user.timestamp) || null,
+            called_station_id: apId || user.called_station_id,
+          });
+        }
+      };
+
+      // === ALL APs Mode ===
       if (this.selectedAccessPoint === "ALL_APS") {
         for (const ap of this.allConnectedUsersData) {
           const apId = ap.called_station_id;
-
-          const perAPUserMap = new Map();
-
-          for (const user of ap.currently_connected_users || []) {
-            const key = user.username || user.calling_station_id;
-            if (key && !perAPUserMap.has(key)) {
-              perAPUserMap.set(key, {
-                ...user,
-                timestamp: Number(user.timestamp) || null,
-                called_station_id: apId, 
-              });
-            }
-          }
-
-          for (const [key, user] of perAPUserMap) {
-            uniqueUsersMap.set(`${key}_${apId}`, user);
-          }
+          addUniqueUsers(ap.currently_connected_users, apId);
         }
-      } else {
+      } 
+      // === Single AP Mode ===
+      else {
         const apData = this.allConnectedUsersData.find(
           ap => ap.called_station_id === this.selectedAccessPoint
         );
-        const apUsers = apData?.currently_connected_users?.map(user => ({
-          ...user,
-          timestamp: Number(user.timestamp) || null,
-        })) || [];
-
-        for (const user of apUsers) {
-          const key = user.username || user.calling_station_id;
-          if (key && !uniqueUsersMap.has(key)) {
-            uniqueUsersMap.set(key, user);
-          }
+        if (apData) {
+          addUniqueUsers(apData.currently_connected_users);
         }
       }
+
       this.connectedUsers = Array.from(uniqueUsersMap.values());
     },
     formatTimestamp(timestamp) {
