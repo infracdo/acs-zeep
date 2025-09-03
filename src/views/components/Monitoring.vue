@@ -387,13 +387,13 @@ export default {
         {
           title: "Total Session Time",
           value: "-",
-          color: "#E7A877",
+          color: "#6C85CC",
           key: "totalBandwidthConsumptionToday",
         },
         {
           title: "Total User Sessions",
           value: "-",
-          color: "#C7B28B",
+          color: "#4E5BAE",
           key: "totalUserSessionsToday",
         },
       ],
@@ -401,13 +401,13 @@ export default {
         {
           title: "Average Bandwidth Usage",
           value: "-",
-          color: "#18346B",
+          color: "#5271AB",
           key: "averageBandwidthPerConnection",
         },
         {
           title: "Average Session Time",
           value: "-",
-          color: "#6D2E1B",
+          color: "#18346B",
           key: "averageConnectionTime",
         },
       ],
