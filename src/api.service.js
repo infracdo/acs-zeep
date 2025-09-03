@@ -40,24 +40,36 @@ class ApiService {
   // }
 
   // FOR RADIUS DATA RETRIEVAL APIs
-  getCountCurrentlyConnectedUsers() {
-    return http.get('/api/radius/count-currently-connected-users');
+  getCountOnlineUsers() {
+    return http.get('/api/radius/count-online-users');
   }
   
-  getCountTotalUsers() {
-    return http.get('/api/radius/count-total-users');
+  getCountActiveUsers() {
+    return http.get('/api/radius/count-active-users');
+  }
+  
+  getCountInactiveUsers() {
+    return http.get('/api/radius/count-inactive-users');
+  }
+  
+  getCountRegisteredUsers() {
+    return http.get('/api/radius/count-registered-users');
   }
 
-  getCountCurrentlyConnectedAPs() {
-    return http.get('/api/radius/count-currently-connected-aps');
+  getCountOnlineAPs() {
+    return http.get('/api/radius/count-online-aps');
+  }
+
+  getCountActiveAPs() {
+    return http.get('/api/radius/count-active-aps');
+  }
+
+  getCountInactiveAPs() {
+    return http.get('/api/radius/count-inactive-aps');
   }
 
   getTotalUserConnectionsToday() {
     return http.get('/api/radius/total-active-aps');
-  }
-
-  getCountTotalActiveAPs() {
-    return http.get('/api/radius/count-total-aps');
   }
 
   getTotalSessionTimeToday() {
@@ -100,12 +112,16 @@ class ApiService {
     return http.get('/api/radius/access-points');
   }
   
-  getAccessPointsOnline() {
+  getOnlineRegisteredAPs() {
     return http.get('/api/radius/access-points-online');
   }
+  
+  getOfflineRegisteredAPs() {
+    return http.get('/api/radius/access-points-offline');
+  }
 
-  getAccessPointsAll() {
-    return http.get('/api/radius/access-points-all');
+  getAllRegisteredAPs() {
+    return http.get('/api/radius/access-points-zeep');
   }
   
 }

@@ -44,7 +44,7 @@
         </v-card-title>
         <v-row>
           <v-col
-            v-for="(card, index) in cardsAP"
+            v-for="(card, index) in cardsRadiusAP"
             :key="index"
             cols="12"
             sm="6"
@@ -72,7 +72,7 @@
         </v-row>
         <v-row>
           <v-col
-            v-for="(card, index) in cardsACS"
+            v-for="(card, index) in cardsAcsAP"
             :key="index"
             cols="12"
             sm="6"
@@ -296,7 +296,7 @@
             <v-data-table
               dense
               :headers="apHeaders"
-              :items="allConnectedAPData"
+              :items="onlineAPRegisteredData"
               item-key="serial_number"
               :loading="loading"
               loading-text="Loading... Please wait"
@@ -327,11 +327,17 @@ export default {
         {
           title: "Total Active Users",
           value: "-",
+          color: "#4C925E",
+          key: "totalUsers",
+        },
+        {
+          title: "Total Registered Users",
+          value: "-",
           color: "#336951",
           key: "totalUsers",
         },
       ],
-      cardsAP: [
+      cardsRadiusAP: [
         {
           title: "Current Online APs",
           value: "-",
@@ -341,19 +347,31 @@ export default {
         {
           title: "Total Active APs",
           value: "-",
-          color: "#166A6A",
+          color: "#3B897E",
+          key: "allConnectedAPData",
+        },
+        {
+          title: "Total Inactive APs",
+          value: "-",
+          color: "#004B56",
           key: "allConnectedAPData",
         },
       ],
-      cardsACS: [
+      cardsAcsAP: [
         {
-          title: "Online APs",
+          title: "Online Registered APs",
           value: "-",
           color: "#4B8F78",
           key: "allConnectedAPData",
         },
         {
-          title: "Total APs",
+          title: "Offline Registered APs",
+          value: "-",
+          color: "#2C665A",
+          key: "allConnectedAPData",
+        },
+        {
+          title: "Total Registered APs",
           value: "-",
           color: "#0E3C3C",
           key: "allConnectedAPData",
@@ -523,9 +541,10 @@ export default {
       connectedUsersPerAP: 0,
       connectedUsersPerAPMap: {},
       connectedUsers: [],
-      allConnectedUsersData: [],
-      allConnectedAPData: [],
-      totalAPData: [],
+      allOnlineUsersData: [],
+      onlineAPRegisteredData: [],
+      offlineAPRegisteredData: [],
+      totalRegisteredAPData: [],
       currentConnectedAPs: [],
       accessPointOptions: [],
       formattedAccessPointOptions: [],
@@ -604,19 +623,23 @@ export default {
 
         // Fetch all data in parallel
         const [ // user insights
-          countConnectedUsersResponse, // current online users
-          countTotalUsersResponse, // total active users
+          countOnlineUsersResponse, // current online users
+          countActiveUsersResponse, // total active users
+          countRegisteredUsersResponse, // total registered users
         ] = await Promise.all([
-          ApiService.getCountCurrentlyConnectedUsers(),
-          ApiService.getCountTotalUsers(),
+          ApiService.getCountOnlineUsers(),
+          ApiService.getCountActiveUsers(),
+          ApiService.getCountRegisteredUsers(),
         ]);
 
         const [ // ap insights
-          countConnectedAPsResponse, // current online aps
+          countOnlineAPsResponse, // current online aps
           countActiveAPsResponse, // total active aps
+          countInactiveAPsResponse, // total offline aps
         ] = await Promise.all([
-          ApiService.getCountCurrentlyConnectedAPs(),
-          ApiService.getCountTotalActiveAPs(),
+          ApiService.getCountOnlineAPs(),
+          ApiService.getCountActiveAPs(),
+          ApiService.getCountInactiveAPs(),
         ]);
 
         const [ // today's overview
@@ -638,16 +661,18 @@ export default {
         ]);
 
         const [ // acs aps
-          accessPointsOnlineResponse, // online aps
-          accessPointsAllResponse, // online aps
+          onlineAPsResponse, // online aps
+          offlineAPsResponse, // offline aps
+          registeredAPsResponse, // all registered aps
         ] = await Promise.all([
-          ApiService.getAccessPointsOnline(),
-          ApiService.getAccessPointsAll(),
+          ApiService.getOnlineRegisteredAPs(),
+          ApiService.getOfflineRegisteredAPs(),
+          ApiService.getAllRegisteredAPs(),
         ]);
 
         const [ // tables
           countConnectedUsersPerApResponse,
-          connectedUsersPerApResponse,
+          onlineUsersPerApResponse,
           accessPointsResponse,
         ] = await Promise.all([
           ApiService.getCountCurrentlyConnectedUsersPerAP(),
@@ -656,20 +681,17 @@ export default {
         ]);
 
         // Update overall summary cards
-        this.cardsUsers[0].value =
-          countConnectedUsersResponse.data.currentlyConnectedUsers;
-        this.cardsUsers[1].value = countTotalUsersResponse.data.totalUsers;
+        this.cardsUsers[0].value = countOnlineUsersResponse.data.countOnlineUsers;
+        this.cardsUsers[1].value = countActiveUsersResponse.data.countActiveUsers;
+        this.cardsUsers[2].value = countRegisteredUsersResponse.data.countRegisteredUsers; 
 
-        this.cardsAP[0].value =
-          countConnectedAPsResponse.data.currentlyConnectedAPs;
-        this.cardsAP[1].value = countActiveAPsResponse.data.totalAPs;
+        this.cardsRadiusAP[0].value = countOnlineAPsResponse.data.countOnlineAPs;
+        this.cardsRadiusAP[1].value = countActiveAPsResponse.data.countActiveAPs;
+        this.cardsRadiusAP[2].value = countInactiveAPsResponse.data.countInactiveAPs; 
 
-        this.cardsTotal[0].value =
-          totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
-        this.cardsTotal[1].value =
-          totalSessionTimeTodayResponse.data.totalSessionTimeToday;
-        this.cardsTotal[2].value =
-          totalUserSessionsTodayResponse.data.totalUserSessionsToday;
+        this.cardsTotal[0].value = totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
+        this.cardsTotal[1].value = totalSessionTimeTodayResponse.data.totalSessionTimeToday;
+        this.cardsTotal[2].value = totalUserSessionsTodayResponse.data.totalUserSessionsToday;
 
         this.cardsAvg[0].value =
           avgBandwidthConnectionResponse.data.averageBandwidthForMonth;
@@ -686,13 +708,15 @@ export default {
         });
 
         // Store all connected users data
-        this.allConnectedUsersData = connectedUsersPerApResponse.data;
+        this.allOnlineUsersData = onlineUsersPerApResponse.data;
 
-        this.allConnectedAPData = accessPointsOnlineResponse.data;
-        this.totalAPData = accessPointsAllResponse.data;
+        this.onlineAPRegisteredData = onlineAPsResponse.data;
+        this.offlineAPRegisteredData = offlineAPsResponse.data;
+        this.totalRegisteredAPData = registeredAPsResponse.data;
 
-        this.cardsACS[0].value = this.allConnectedAPData.length;
-        this.cardsACS[1].value = this.totalAPData.length;
+        this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
+        this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length; 
+        this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
 
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -769,14 +793,14 @@ export default {
 
       // === ALL APs Mode ===
       if (this.selectedAccessPoint === "ALL_APS") {
-        for (const ap of this.allConnectedUsersData) {
+        for (const ap of this.allOnlineUsersData) {
           const apId = ap.called_station_id;
           addUniqueUsers(ap.currently_connected_users, apId);
         }
       } 
       // === Single AP Mode ===
       else {
-        const apData = this.allConnectedUsersData.find(
+        const apData = this.allOnlineUsersData.find(
           ap => ap.called_station_id === this.selectedAccessPoint
         );
         if (apData) {
