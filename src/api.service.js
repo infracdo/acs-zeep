@@ -123,6 +123,10 @@ class ApiService {
   getAllRegisteredAPs() {
     return http.get('/api/radius/access-points-zeep');
   }
+
+  getAllRogueAPs() {
+    return http.get('/api/radius/access-points-rogue');
+  }
   
 }
 /* eslint-enable class-methods-use-this */

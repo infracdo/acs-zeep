@@ -358,20 +358,26 @@ export default {
         },
       ],
       cardsAcsAP: [
+        // {
+        //   title: "Online Registered APs",
+        //   value: "-",
+        //   color: "#4B8F78",
+        //   key: "allConnectedAPData",
+        // },
+        // {
+        //   title: "Offline Registered APs",
+        //   value: "-",
+        //   color: "#2C665A",
+        //   key: "allConnectedAPData",
+        // },
+        // {
+        //   title: "Total Registered APs",
+        //   value: "-",
+        //   color: "#0E3C3C",
+        //   key: "allConnectedAPData",
+        // },
         {
-          title: "Online Registered APs",
-          value: "-",
-          color: "#4B8F78",
-          key: "allConnectedAPData",
-        },
-        {
-          title: "Offline Registered APs",
-          value: "-",
-          color: "#2C665A",
-          key: "allConnectedAPData",
-        },
-        {
-          title: "Total Registered APs",
+          title: "Total Device for Deployment",
           value: "-",
           color: "#0E3C3C",
           key: "allConnectedAPData",
@@ -542,6 +548,7 @@ export default {
       connectedUsersPerAPMap: {},
       connectedUsers: [],
       allOnlineUsersData: [],
+      rogueAPRegisteredData: [],
       onlineAPRegisteredData: [],
       offlineAPRegisteredData: [],
       totalRegisteredAPData: [],
@@ -660,14 +667,20 @@ export default {
           ApiService.getAverageConnectionTimeForMonth(),
         ]);
 
+        // const [ // acs aps
+        //   onlineAPsResponse, // online aps
+        //   offlineAPsResponse, // offline aps
+        //   registeredAPsResponse, // all registered aps
+        // ] = await Promise.all([
+        //   ApiService.getOnlineRegisteredAPs(),
+        //   ApiService.getOfflineRegisteredAPs(),
+        //   ApiService.getAllRegisteredAPs(),
+        // ]);
+
         const [ // acs aps
-          onlineAPsResponse, // online aps
-          offlineAPsResponse, // offline aps
-          registeredAPsResponse, // all registered aps
+          rogueAPsResponse, // all registered aps
         ] = await Promise.all([
-          ApiService.getOnlineRegisteredAPs(),
-          ApiService.getOfflineRegisteredAPs(),
-          ApiService.getAllRegisteredAPs(),
+          ApiService.getAllRogueAPs(),
         ]);
 
         const [ // tables
@@ -710,13 +723,15 @@ export default {
         // Store all connected users data
         this.allOnlineUsersData = onlineUsersPerApResponse.data;
 
-        this.onlineAPRegisteredData = onlineAPsResponse.data;
-        this.offlineAPRegisteredData = offlineAPsResponse.data;
-        this.totalRegisteredAPData = registeredAPsResponse.data;
+        // this.onlineAPRegisteredData = onlineAPsResponse.data;
+        // this.offlineAPRegisteredData = offlineAPsResponse.data;
+        // this.totalRegisteredAPData = registeredAPsResponse.data;
+        this.rogueAPRegisteredData = rogueAPsResponse.data;
 
-        this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
-        this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length; 
-        this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
+        this.cardsAcsAP[0].value = this.rogueAPRegisteredData.length;
+        // this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
+        // this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length; 
+        // this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
 
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
