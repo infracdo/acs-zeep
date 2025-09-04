@@ -113,7 +113,7 @@ class ApiService {
   }
   
   getOnlineRegisteredAPs() {
-    return http.get('/api/radius/access-points-online');
+    return http.get('/api/radius/access-points-registered');
   }
   
   getOfflineRegisteredAPs() {
