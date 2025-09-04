@@ -667,15 +667,15 @@ export default {
           ApiService.getAverageConnectionTimeForMonth(),
         ]);
 
-        // const [ // acs aps
-        //   onlineAPsResponse, // online aps
-        //   offlineAPsResponse, // offline aps
-        //   registeredAPsResponse, // all registered aps
-        // ] = await Promise.all([
-        //   ApiService.getOnlineRegisteredAPs(),
-        //   ApiService.getOfflineRegisteredAPs(),
-        //   ApiService.getAllRegisteredAPs(),
-        // ]);
+        const [ // acs aps
+          onlineAPsResponse, // online aps
+          offlineAPsResponse, // offline aps
+          registeredAPsResponse, // all registered aps
+        ] = await Promise.all([
+          ApiService.getOnlineRegisteredAPs(),
+          ApiService.getOfflineRegisteredAPs(),
+          ApiService.getAllRegisteredAPs(),
+        ]);
 
         const [ // acs aps
           rogueAPsResponse, // all registered aps
@@ -723,9 +723,9 @@ export default {
         // Store all connected users data
         this.allOnlineUsersData = onlineUsersPerApResponse.data;
 
-        // this.onlineAPRegisteredData = onlineAPsResponse.data;
-        // this.offlineAPRegisteredData = offlineAPsResponse.data;
-        // this.totalRegisteredAPData = registeredAPsResponse.data;
+        this.onlineAPRegisteredData = onlineAPsResponse.data;
+        this.offlineAPRegisteredData = offlineAPsResponse.data;
+        this.totalRegisteredAPData = registeredAPsResponse.data;
         this.rogueAPRegisteredData = rogueAPsResponse.data;
 
         this.cardsAcsAP[0].value = this.rogueAPRegisteredData.length;
