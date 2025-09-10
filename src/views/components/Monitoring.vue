@@ -17,7 +17,7 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}">
+            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -50,7 +50,7 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}">
+            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -307,6 +307,117 @@
         </v-card>
       </v-col>
     </v-card>
+
+    <v-dialog v-model="showModal" max-width="1400px" :style="{ 'z-index': 1400 }">
+      <v-card>
+        <v-card-title class="text-h6">
+          {{ selectedCard?.title }}
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            label="Search By Username"
+            dense
+            outlined
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            style="max-width: 300px"
+          />
+          <v-btn icon @click="showModal = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        
+        <v-card-text>
+          <div v-if="selectedCard && selectedCard?.title == 'Current Online Users'" style="margin-top: 16px;">
+            <v-data-table
+                :headers="selectedCard.headers"
+                :items="rows"
+                :search="search"
+                :loading="fetchingData"
+                loading-text="Fetching... Please wait"
+                class="elevation-1"
+                :key="rowsKey"
+                :items-per-page="selectedCard.itemsPerPage"
+                :server-items-length="selectedCard.totalRows"
+                @update:page="fetchRows"
+              >
+              <template v-slot:no-data>
+                <div v-if ="!fetchingData">
+                  <v-alert type="info">No data available</v-alert>
+                </div>
+              </template>
+              <template v-slot:item.username="{ item }">
+                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                  {{ item.username || 'N/A' }}
+                </span>
+              </template>
+            </v-data-table>
+          </div>
+
+          <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')" style="margin-top: 16px;">
+            <v-data-table
+              :search="search"
+              :headers="selectedCard.headers"
+              :loading="fetchingData"
+              loading-text="Fetching... Please wait"
+              :key="rowsKey"
+              :items="rows"
+              :items-per-page="10"
+              class="elevation-1"
+            >
+              <template v-slot:no-data>
+                <div v-if ="!fetchingData">
+                  <v-alert type="info">No data available</v-alert>
+                </div>
+              </template>
+              <template v-slot:item.calledStationId="{ item }">
+                {{ formatApId(item.calledStationId) }}
+              </template>
+
+              <template v-slot:item.callingStationId="{ item }">
+                {{ formatMacAddress(item.callingStationId) }}
+              </template>
+              
+              <template v-slot:item.username="{ item }">
+                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                  {{ item.username || 'N/A' }}
+                </span>
+              </template>
+            </v-data-table>
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="showSecondaryMondal" max-width="2000px" :style="{ 'z-index': 2000 }">
+      <v-card>
+        <v-card-title>{{ secondaryModalTitle }}</v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="secondaryModalHeaders"
+            :loading="fetchingData"
+            loading-text="Fetching... Please wait"
+            :items="secondaryModalItems"
+            :items-per-page="10"
+            class="elevation-1"
+          >
+            <template v-slot:no-data>
+              <div>No data available</div>
+            </template>
+            <template v-slot:item.calledStationId="{ item }">
+              {{ formatApId(item.calledStationId) }}
+            </template>
+
+            <template v-slot:item.callingStationId="{ item }">
+              {{ formatMacAddress(item.callingStationId) }}
+            </template>
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text @click="showSecondaryMondal = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -317,24 +428,56 @@ export default {
   name: "MonitoringDashboard",
   data() {
     return {
+      showModal: false,
+      showSecondaryMondal: false,
+      secondaryModalHeaders: [],
+      secondaryModalItems: [],
+      selectedCard: null,
+      rows: [],
       cardsUsers: [
         {
           title: "Current Online Users",
           value: "-",
           color: "#66BB6A",
           key: "connectedUsers",
+          page: 1,
+          itemsPerPage: 10,
+          totalPageCount: 0,
+          headers: [
+            { text: "User", value: "username" },
+            { text: "Active Sessions", value: "total_active_session_count" },
+            { text: "Total Duration", value: "total_session_duration" },
+            { text: "Total Bandwidth Usage", value: "totalBandwidthUsage" },
+          ],
         },
         {
           title: "Total Active Users",
           value: "-",
           color: "#4C925E",
           key: "totalUsers",
+          page: 1,
+          itemsPerPage: 10,
+          totalPageCount: 0,
+          headers: [
+            { text: "User", value: "username" },
+            { text: "Total Sessions", value: "sessionCount" },
+            { text: "Total Time", value: "totalTime" },
+            { text: "Total Bandwidth", value: "totalBandwidthUsage" },
+            { text: "Avg. Session Length", value: "avgSessionLength" }
+          ],
         },
         {
           title: "Total Registered Users",
           value: "-",
           color: "#336951",
           key: "totalUsers",
+          headers: [
+            { text: "User", value: "username" },
+            { text: "Total Sessions", value: "sessionCount" },
+            { text: "Total Time", value: "totalTime" },
+            { text: "Total Bandwidth", value: "totalBandwidthUsage" },
+            { text: "Avg. Session Length", value: "avgSessionLength" }
+          ],
         },
       ],
       cardsRadiusAP: [
@@ -343,18 +486,42 @@ export default {
           value: "-",
           color: "#75C6A6",
           key: "connectedAPs",
+          headers: [
+            { text: "AP ID", value: "a" },
+            { text: "Sessions", value: "b" },
+            { text: "User", value: "c" },
+            { text: "Total Bandwidth", value: "e" },
+            { text: "Peak Time", value: "e" },
+            { text: "Avg. Session Duration", value: "f" },
+          ],
         },
         {
           title: "Total Active APs",
           value: "-",
           color: "#3B897E",
           key: "allConnectedAPData",
+          headers: [
+            { text: "AP ID", value: "a" },
+            { text: "Sessions", value: "b" },
+            { text: "User", value: "c" },
+            { text: "Total Bandwidth", value: "e" },
+            { text: "Peak Time", value: "e" },
+            { text: "Avg. Session Duration", value: "f" },
+          ],
         },
         {
           title: "Total Inactive APs",
           value: "-",
           color: "#004B56",
           key: "allConnectedAPData",
+          headers: [
+            { text: "AP ID", value: "a" },
+            { text: "Sessions", value: "b" },
+            { text: "User", value: "c" },
+            { text: "Total Bandwidth", value: "e" },
+            { text: "Peak Time", value: "e" },
+            { text: "Avg. Session Duration", value: "f" },
+          ],
         },
       ],
       cardsAcsAP: [
@@ -634,9 +801,9 @@ export default {
           countActiveUsersResponse, // total active users
           countRegisteredUsersResponse, // total registered users
         ] = await Promise.all([
-          ApiService.getCountOnlineUsers(),
-          ApiService.getCountActiveUsers(),
-          ApiService.getCountRegisteredUsers(),
+          ApiService.getCountForAllCurrentOnlineUsers(),
+          ApiService.getCountForAllActiveUsersForThePast7Days(),
+          ApiService.getCountForAllRegisteredUsersWithSessions(),
         ]);
 
         const [ // ap insights
@@ -694,9 +861,9 @@ export default {
         ]);
 
         // Update overall summary cards
-        this.cardsUsers[0].value = countOnlineUsersResponse.data.countOnlineUsers;
-        this.cardsUsers[1].value = countActiveUsersResponse.data.countActiveUsers;
-        this.cardsUsers[2].value = countRegisteredUsersResponse.data.countRegisteredUsers; 
+        this.cardsUsers[0].value = countOnlineUsersResponse.data.totalCount;
+        this.cardsUsers[1].value = countActiveUsersResponse.data.totalCount;
+        this.cardsUsers[2].value = countRegisteredUsersResponse.data.totalCount;
 
         this.cardsRadiusAP[0].value = countOnlineAPsResponse.data.countOnlineAPs;
         this.cardsRadiusAP[1].value = countActiveAPsResponse.data.countActiveAPs;
@@ -844,6 +1011,131 @@ export default {
       const cleaned = mac.replace(/[^a-fA-F0-9]/g, "").toUpperCase();
       return cleaned.match(/.{1,2}/g)?.join(":") || mac;
     },
+    formatApId(value) {
+      if (!value) return '';
+      const part = value.split(':')[0];
+      const upper = part.toUpperCase();
+      return upper.match(/.{1,2}/g).join(':');
+    },
+    async openModal(card) {
+      // console.log("Fetching rows for card:", card);
+      // const limit = Number(card?.itemsPerPage || 10);
+      // const offset = Number(((card?.page || 1) - 1) * limit);
+      const limit = 100;
+      const offset = 0;
+      this.selectedCard = card;
+      this.fetchingData = true;
+      this.rows = [];
+      this.showModal = true;
+      
+      if(this.selectedCard.title == "Current Online Users"){
+        try{
+          const { data } = await ApiService.getAllCurrentOnlineUserDetails({ limit , offset });
+          const { data: count } = await ApiService.getCountForAllCurrentOnlineUsers();
+          const totalRows = count.totalCount || 0;
+          const pageCount = Math.ceil(totalRows / limit);
+          this.selectedCard.totalRows = totalRows;
+          this.totalPageCount = pageCount || 1;
+          this.rows = data.currentOnlineUsers || [];
+          this.rowsKey = Date.now();
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          console.error("Error fetching detailed data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(this.selectedCard.title == "Total Active Users" || this.selectedCard.title == "Total Registered Users"){
+        try{
+          let url1, url2;
+          if(this.selectedCard.title == "Total Registered Users"){
+            url1 = await ApiService.getAllRegisteredUsersWithSessions({ limit, offset });
+            url2 = await ApiService.getCountForAllRegisteredUsersWithSessions();
+          }else if(this.selectedCard.title == "Total Active Users"){
+            url1 = await ApiService.getAllActiveUsersForThePast7Days({ limit, offset });
+            url2 = await ApiService.getCountForAllActiveUsersForThePast7Days();
+          }
+          const { data } = await url1;
+          const { data: count } = await url2;
+          const totalRows = count.totalCount || 0;
+          const pageCount = Math.ceil(totalRows / limit);
+          this.rows = Object.values(data)[0] || [];
+          this.selectedCard.totalRows = totalRows;
+          this.totalPageCount = pageCount || 1;
+          this.rowsKey = Date.now();
+
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          console.error("Error fetching detailed data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }
+    },
+    async openSecondaryModal(item, selectedCardTitle) {
+      // console.log("openSecondaryModal:", item.username);
+      this.showSecondaryMondal = true;
+      this.fetchingData = true;
+      
+      if(selectedCardTitle == "Current Online Users"){
+        try{
+          const { data } = await ApiService.getUserSessions({ username: item.username });
+          this.secondaryModalTitle = `User Session Details for ${item.username}`;
+          this.secondaryModalItems = data.userSessions || [];
+          this.secondaryModalHeaders = [
+            { text: "Session ID", value: "acctSessionId" },
+            { text: "Start Time", value: "startTime" },
+            { text: "Duration", value: "duration" },
+            { text: "Bandwidth", value: "bandwidthUsage" },
+            { text: "Calling Station", value: "callingStationId" },
+            { text: "Called Station", value: "calledStationId" },
+          ];
+          // console.log("Fetched user session details:", this.secondaryModalItems);
+        } catch (error) {
+          console.error("Error fetching user session details:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(selectedCardTitle == "Total Active Users" || selectedCardTitle == "Total Registered Users"){
+        try{
+          let url;
+          if(selectedCardTitle == "Total Active Users"){
+            url = ApiService.getAllSessionsByUsernameForLast7Days({ username: item.username, limit: 100, offset: 0 });
+          }else if(selectedCardTitle == "Total Registered Users"){
+            url = ApiService.getAllSessionsByUsername({ username: item.username, limit: 100, offset: 0 });
+          }
+          const { data } = await url;
+          this.secondaryModalTitle = `User Session Details for ${item.username}`;
+          this.secondaryModalItems = data.userSessions|| [];
+          this.secondaryModalHeaders = [
+            { text: "Session ID", value: "acctSessionId" },
+            { text: "Start Time", value: "startTime" },
+            { text: "Duration", value: "duration" },
+            { text: "Bandwidth Used", value: "bandwidthUsage" },
+            { text: "Device", value: "callingStationId" },
+            { text: "AP ID", value: "calledStationId" },
+          ];
+          // console.log("Fetched data:", this.secondaryModalItems);
+        } catch (error) {
+          console.error("Error fetching user session details:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }
+    },
+    //TODO: implement pagination in modal
+    async fetchRows(page) {
+      this.selectedCard.page = page;
+      await this.openModal(this.selectedCard);
+    },
+  },
+  // TODO: optimize by fetching data only when modal is opened
+  watch: {
+    showModal(newVal) {
+      if (newVal) {
+        this.page = 1;
+        this.fetchRows();
+      }
+    },
   },
 };
 </script>
@@ -860,5 +1152,15 @@ export default {
 
 .header-nowrap >>> th {
   padding: 0 16px !important;
+}
+
+.hover-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 8px rgba(0,0,0,0.3);
 }
 </style>
