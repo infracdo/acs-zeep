@@ -43,11 +43,48 @@ class ApiService {
   getCountOnlineUsers() {
     return http.get('/api/radius/count-online-users');
   }
+
+  getAllCurrentOnlineUserDetails(params) {
+    return http.get('/api/radius/online-users', { params });
+  }
+  
+  getUserSessions(params) {
+    return http.get('/api/radius/online-users/userSession', { params });
+  }
+  
+  getCountForAllCurrentOnlineUsers() {
+    return http.get('/api/radius/online-users/countAll');
+  }
+  
   
   getCountActiveUsers() {
     return http.get('/api/radius/count-active-users');
   }
   
+  getAllActiveUsersForThePast7Days(params) {
+    return http.get('/api/radius/active-users', { params });
+  }
+  
+  getCountForAllActiveUsersForThePast7Days() {
+    return http.get('/api/radius/active-users/countAll');
+  }
+  
+  getAllSessionsByUsernameForLast7Days(params) {
+    return http.get('/api/radius/active-users/userSessions', { params });
+  }
+  
+  getAllRegisteredUsersWithSessions(params) {
+    return http.get('/api/radius/all-users-with-sessions', { params });
+  }
+  
+  getCountForAllRegisteredUsersWithSessions() {
+    return http.get('/api/radius/all-users-with-sessions/countAll');
+  }
+  
+  getAllSessionsByUsername(params) {
+    return http.get('/api/radius/all-users-with-sessions/userSessions', { params });
+  }
+
   getCountInactiveUsers() {
     return http.get('/api/radius/count-inactive-users');
   }
