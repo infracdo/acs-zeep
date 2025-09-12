@@ -314,7 +314,7 @@
           {{ selectedCard?.title }}
           <v-spacer></v-spacer>
           <v-text-field
-            v-model="search"
+            v-model="searchByUsername"
             label="Search By Username"
             dense
             outlined
@@ -322,62 +322,38 @@
             prepend-inner-icon="mdi-magnify"
             style="max-width: 300px"
           />
-          <v-btn icon @click="showModal = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
         </v-card-title>
         
         <v-card-text>
-          <div v-if="selectedCard && selectedCard?.title == 'Current Online Users'" style="margin-top: 16px;">
+          <div v-if="selectedCard" style="margin-top: 16px;">
             <v-data-table
-                :headers="selectedCard.headers"
-                :items="rows"
-                :search="search"
-                :loading="fetchingData"
-                loading-text="Fetching... Please wait"
-                class="elevation-1"
-                :key="rowsKey"
-                :items-per-page="selectedCard.itemsPerPage"
-                :server-items-length="selectedCard.totalRows"
-                @update:page="fetchRows"
-              >
-              <template v-slot:no-data>
-                <div v-if ="!fetchingData">
-                  <v-alert type="info">No data available</v-alert>
-                </div>
-              </template>
-              <template v-slot:item.username="{ item }">
-                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                  {{ item.username || 'N/A' }}
-                </span>
-              </template>
-            </v-data-table>
-          </div>
-
-          <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')" style="margin-top: 16px;">
-            <v-data-table
-              :search="search"
+              :search="searchByUsername"
               :headers="selectedCard.headers"
               :loading="fetchingData"
               loading-text="Fetching... Please wait"
               :key="rowsKey"
               :items="rows"
               :items-per-page="10"
-              class="elevation-1"
+              class="solid-shadow"
             >
               <template v-slot:no-data>
                 <div v-if ="!fetchingData">
                   <v-alert type="info">No data available</v-alert>
                 </div>
               </template>
+            
               <template v-slot:item.calledStationId="{ item }">
-                {{ formatApId(item.calledStationId) }}
+                <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
+                  {{ formatApId(item.calledStationId) }}
+                </div>
               </template>
-
+                
               <template v-slot:item.callingStationId="{ item }">
-                {{ formatMacAddress(item.callingStationId) }}
+                <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
+                  {{ formatMacAddress(item.callingStationId) }}
+                </div>
               </template>
-              
+                
               <template v-slot:item.username="{ item }">
                 <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
                   {{ item.username || 'N/A' }}
@@ -385,11 +361,15 @@
               </template>
             </v-data-table>
           </div>
+
+          <!-- <v-card-actions>
+            <v-btn text @click="showSecondaryModal = false">Close</v-btn>
+          </v-card-actions> -->
         </v-card-text>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="showSecondaryMondal" max-width="2000px" :style="{ 'z-index': 2000 }">
+    <v-dialog v-model="showSecondaryModal" max-width="2000px" :style="{ 'z-index': 2000 }">
       <v-card>
         <v-card-title>{{ secondaryModalTitle }}</v-card-title>
         <v-card-text>
@@ -399,7 +379,7 @@
             loading-text="Fetching... Please wait"
             :items="secondaryModalItems"
             :items-per-page="10"
-            class="elevation-1"
+            class="solid-shadow"
           >
             <template v-slot:no-data>
               <div>No data available</div>
@@ -413,9 +393,9 @@
             </template>
           </v-data-table>
         </v-card-text>
-        <v-card-actions>
-          <v-btn text @click="showSecondaryMondal = false">Close</v-btn>
-        </v-card-actions>
+        <!-- <v-card-actions>
+          <v-btn text @click="showSecondaryModal = false">Close</v-btn>
+        </v-card-actions> -->
       </v-card>
     </v-dialog>
   </v-container>
@@ -428,12 +408,15 @@ export default {
   name: "MonitoringDashboard",
   data() {
     return {
+      fetchingData: false,
       showModal: false,
-      showSecondaryMondal: false,
+      showSecondaryModal: false,
+      searchByUsername: "",
+      selectedCard: null,
+      rowsKey: 0,
+      rows: [],
       secondaryModalHeaders: [],
       secondaryModalItems: [],
-      selectedCard: null,
-      rows: [],
       cardsUsers: [
         {
           title: "Current Online Users",
@@ -1024,6 +1007,7 @@ export default {
       const limit = 100;
       const offset = 0;
       this.selectedCard = card;
+      this.searchByUsername = "";
       this.fetchingData = true;
       this.rows = [];
       this.showModal = true;
@@ -1073,7 +1057,7 @@ export default {
     },
     async openSecondaryModal(item, selectedCardTitle) {
       // console.log("openSecondaryModal:", item.username);
-      this.showSecondaryMondal = true;
+      this.showSecondaryModal = true;
       this.fetchingData = true;
       
       if(selectedCardTitle == "Current Online Users"){
@@ -1163,4 +1147,9 @@ export default {
   transform: scale(1.05);
   box-shadow: 0 5px 8px rgba(0,0,0,0.3);
 }
+
+.solid-shadow {
+  box-shadow: 0 0 5px rgba(0,0,0,0.3) !important;
+}
+
 </style>
