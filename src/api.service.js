@@ -44,47 +44,86 @@ class ApiService {
     return http.get('/api/radius/count-online-users');
   }
 
-  getAllCurrentOnlineUserDetails(params) {
-    return http.get('/api/radius/online-users', { params });
+  getAllCurrentOnlineUserDetails() {
+    return http.get('/api/radius/users/online');
   }
   
-  getUserSessions(params) {
-    return http.get('/api/radius/online-users/userSession', { params });
+  getAllSessionsByUsernameForCurrentOnlineUsers(username) {
+    return http.get(`/api/radius/users/online/${username}/sessions`);
   }
   
   getCountForAllCurrentOnlineUsers() {
-    return http.get('/api/radius/online-users/countAll');
+    return http.get('/api/radius/users/online/count');
   }
-  
   
   getCountActiveUsers() {
     return http.get('/api/radius/count-active-users');
   }
   
-  getAllActiveUsersForThePast7Days(params) {
-    return http.get('/api/radius/active-users', { params });
+  getAllActiveUsersForThePast7Days() {
+    return http.get('/api/radius/users/active');
   }
   
   getCountForAllActiveUsersForThePast7Days() {
-    return http.get('/api/radius/active-users/countAll');
+    return http.get('/api/radius/users/active/count');
   }
   
-  getAllSessionsByUsernameForLast7Days(params) {
-    return http.get('/api/radius/active-users/userSessions', { params });
+  getAllSessionsByUsernameForThePast7Days(username) {
+    return http.get(`/api/radius/users/active/${username}/sessions`);
   }
   
-  getAllRegisteredUsersWithSessions(params) {
-    return http.get('/api/radius/all-users-with-sessions', { params });
+  getAllRegisteredUsersWithSessions() {
+    return http.get('/api/radius/users/registered');
   }
   
   getCountForAllRegisteredUsersWithSessions() {
-    return http.get('/api/radius/all-users-with-sessions/countAll');
+    return http.get('/api/radius/users/registered/count');
   }
   
-  getAllSessionsByUsername(params) {
-    return http.get('/api/radius/all-users-with-sessions/userSessions', { params });
+  getAllSessionsByUsername(username) {
+    return http.get(`/api/radius/users/registered/${username}/sessions`);
   }
 
+  getCountForAllCurrentOnlineApForTheLast30Mins() {
+    return http.get('/api/radius/ap/online/count');
+  }
+
+  getAllCurrentOnlineApForTheLast30Mins() {
+    return http.get('/api/radius/ap/online');
+  }
+
+  getCurrentOnlineApForTheLast30MinsByApId(apId) {
+    return http.get(`/api/radius/ap/online/${apId}/users`);
+  }
+  
+  getSessionForCurrentOnlineUsersByUsernameAndApId(apId, username) {
+    return http.get(`/api/radius/ap/online/${apId}/${username}/session`);
+  }
+  
+  getCountForAllActiveApForTheLast7Days() {
+    return http.get('/api/radius/ap/active/count');
+  }
+  
+  getAllActiveApForTheLast7Days(params) {
+    return http.get('/api/radius/ap/active', { params });
+  }
+
+  getAllActiveApForTheLast7DaysByApId(apId, params) {
+    return http.get(`/api/radius/ap/active/${apId}/users`, { params });
+  }
+  
+  getCountForAllInActiveApForMoreThan7Days() {
+    return http.get('/api/radius/ap/in-active/count');
+  }
+
+  getAllInactiveApForMoreThan7Days(params) {
+    return http.get('/api/radius/ap/in-active', { params });
+  }
+
+  getAllInActiveApForTheLast7DaysByApId(apId, params) {
+    return http.get(`/api/radius/ap/in-active/${apId}/users`, { params });
+  }
+  
   getCountInactiveUsers() {
     return http.get('/api/radius/count-inactive-users');
   }

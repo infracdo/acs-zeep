@@ -346,6 +346,12 @@
                 <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
                   {{ formatApId(item.calledStationId) }}
                 </div>
+                
+                <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs' || selectedCard?.title == 'Total Active APs' || selectedCard?.title == 'Total Inactive APs')">
+                  <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                    {{ formatApId(item.calledStationId) }}
+                  </span>
+                </div>
               </template>
                 
               <template v-slot:item.callingStationId="{ item }">
@@ -369,7 +375,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="showSecondaryModal" max-width="2000px" :style="{ 'z-index': 2000 }">
+    <v-dialog v-model="showSecondaryModal" max-width="1500px" :style="{ 'z-index': 2000 }">
       <v-card>
         <v-card-title>{{ secondaryModalTitle }}</v-card-title>
         <v-card-text>
@@ -391,11 +397,50 @@
             <template v-slot:item.callingStationId="{ item }">
               {{ formatMacAddress(item.callingStationId) }}
             </template>
+
+            <template v-slot:item.userName="{ item }">
+              <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs')">
+                <span @click.stop.prevent="openTertiaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                  {{ item.userName || 'N/A' }}
+                </span>
+              </div>
+              <div v-else>
+                {{ item.userName || 'N/A' }}
+              </div>
+            </template>
           </v-data-table>
         </v-card-text>
         <!-- <v-card-actions>
           <v-btn text @click="showSecondaryModal = false">Close</v-btn>
         </v-card-actions> -->
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="showTertiaryModal" max-width="1800px" :style="{ 'z-index': 2000 }">
+      <v-card>
+        <v-card-title>{{ tertiaryModalTitle }}</v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="tertiaryModalHeaders"
+            :loading="fetchingData"
+            loading-text="Fetching... Please wait"
+            :items="tertiaryModalItems"
+            :items-per-page="10"
+            class="solid-shadow"
+          >
+            <template v-slot:no-data>
+              <div>No data available</div>
+            </template>
+            
+            <template v-slot:item.calledStationId="{ item }">
+              {{ formatApId(item.calledStationId) }}
+            </template>
+
+            <template v-slot:item.callingStationId="{ item }">
+              {{ formatMacAddress(item.callingStationId) }}
+            </template>
+          </v-data-table>
+        </v-card-text>
       </v-card>
     </v-dialog>
   </v-container>
@@ -411,12 +456,15 @@ export default {
       fetchingData: false,
       showModal: false,
       showSecondaryModal: false,
+      showTertiaryModal: false,
       searchByUsername: "",
       selectedCard: null,
       rowsKey: 0,
       rows: [],
       secondaryModalHeaders: [],
       secondaryModalItems: [],
+      tertiaryModalHeaders: [],
+      tertiaryModalItems: [],
       cardsUsers: [
         {
           title: "Current Online Users",
@@ -470,12 +518,11 @@ export default {
           color: "#75C6A6",
           key: "connectedAPs",
           headers: [
-            { text: "AP ID", value: "a" },
-            { text: "Sessions", value: "b" },
-            { text: "User", value: "c" },
-            { text: "Total Bandwidth", value: "e" },
-            { text: "Peak Time", value: "e" },
-            { text: "Avg. Session Duration", value: "f" },
+            { text: "AP ID", value: "calledStationId" },
+            { text: "Sessions", value: "totalSessions" },
+            { text: "Total Bandwidth", value: "totalBandwidth" },
+            { text: "Avg. Session Duration", value: "avgSessionDuration" },
+            { text: "Peak Time", value: "peakHour" },
           ],
         },
         {
@@ -484,12 +531,11 @@ export default {
           color: "#3B897E",
           key: "allConnectedAPData",
           headers: [
-            { text: "AP ID", value: "a" },
-            { text: "Sessions", value: "b" },
-            { text: "User", value: "c" },
-            { text: "Total Bandwidth", value: "e" },
-            { text: "Peak Time", value: "e" },
-            { text: "Avg. Session Duration", value: "f" },
+            { text: "AP ID", value: "calledStationId" },
+            { text: "Sessions", value: "totalSessions" },
+            { text: "Total Bandwidth", value: "totalBandwidth" },
+            { text: "Avg. Session Duration", value: "avgSessionDuration" },
+            { text: "Peak Time", value: "peakHour" },
           ],
         },
         {
@@ -498,12 +544,11 @@ export default {
           color: "#004B56",
           key: "allConnectedAPData",
           headers: [
-            { text: "AP ID", value: "a" },
-            { text: "Sessions", value: "b" },
-            { text: "User", value: "c" },
-            { text: "Total Bandwidth", value: "e" },
-            { text: "Peak Time", value: "e" },
-            { text: "Avg. Session Duration", value: "f" },
+            { text: "AP ID", value: "calledStationId" },
+            { text: "Sessions", value: "totalSessions" },
+            { text: "Total Bandwidth", value: "totalBandwidth" },
+            { text: "Avg. Session Duration", value: "avgSessionDuration" },
+            { text: "Peak Time", value: "peakHour" },
           ],
         },
       ],
@@ -794,9 +839,9 @@ export default {
           countActiveAPsResponse, // total active aps
           countInactiveAPsResponse, // total offline aps
         ] = await Promise.all([
-          ApiService.getCountOnlineAPs(),
-          ApiService.getCountActiveAPs(),
-          ApiService.getCountInactiveAPs(),
+          ApiService.getCountForAllCurrentOnlineApForTheLast30Mins(),
+          ApiService.getCountForAllActiveApForTheLast7Days(),
+          ApiService.getCountForAllInActiveApForMoreThan7Days(),
         ]);
 
         const [ // today's overview
@@ -848,9 +893,9 @@ export default {
         this.cardsUsers[1].value = countActiveUsersResponse.data.totalCount;
         this.cardsUsers[2].value = countRegisteredUsersResponse.data.totalCount;
 
-        this.cardsRadiusAP[0].value = countOnlineAPsResponse.data.countOnlineAPs;
-        this.cardsRadiusAP[1].value = countActiveAPsResponse.data.countActiveAPs;
-        this.cardsRadiusAP[2].value = countInactiveAPsResponse.data.countInactiveAPs; 
+        this.cardsRadiusAP[0].value = countOnlineAPsResponse.data.totalCount;
+        this.cardsRadiusAP[1].value = countActiveAPsResponse.data.totalCount;
+        this.cardsRadiusAP[2].value = countInactiveAPsResponse.data.totalCount;
 
         this.cardsTotal[0].value = totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
         this.cardsTotal[1].value = totalSessionTimeTodayResponse.data.totalSessionTimeToday;
@@ -975,6 +1020,159 @@ export default {
 
       this.connectedUsers = Array.from(uniqueUsersMap.values());
     },
+    async openModal(card) {
+      // console.log("Fetching rows for card:", card);
+      this.selectedCard = card;
+      this.searchByUsername = "";
+      this.fetchingData = true;
+      this.rows = [];
+      this.showModal = true;
+      
+      if(this.selectedCard.title == "Current Online Users"){
+        try{
+          const { data } = await ApiService.getAllCurrentOnlineUserDetails({});
+          this.rows = data.currentOnlineUsers || [];
+          this.rowsKey = Date.now();
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(this.selectedCard.title == "Total Active Users" || this.selectedCard.title == "Total Registered Users"){
+        try{
+          let url;
+          if(this.selectedCard.title == "Total Registered Users"){
+            url = await ApiService.getAllRegisteredUsersWithSessions();
+          }else if(this.selectedCard.title == "Total Active Users"){
+            url = await ApiService.getAllActiveUsersForThePast7Days();
+          }
+          const { data } = await url;
+          this.rows = Object.values(data)[0] || [];
+          this.rowsKey = Date.now();
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(this.selectedCard.title == "Current Online APs" || this.selectedCard.title == "Total Active APs" || this.selectedCard.title == "Total Inactive APs"){
+        try{
+          let url;
+          if(this.selectedCard.title == "Current Online APs"){
+            url = await ApiService.getAllCurrentOnlineApForTheLast30Mins();
+          }else if(this.selectedCard.title == "Total Active APs"){
+            url = await ApiService.getAllActiveApForTheLast7Days();
+          }else if(this.selectedCard.title == "Total Inactive APs"){
+            url = await ApiService.getAllInactiveApForMoreThan7Days();
+          }
+          const { data } = await url;
+          this.rows = Object.values(data)[0] || [];
+          this.rowsKey = Date.now();
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }
+    },
+    async openSecondaryModal(item, selectedCardTitle) {
+      // console.log("openSecondaryModal:", item.username);
+      this.showSecondaryModal = true;
+      this.fetchingData = true;
+      
+      if(selectedCardTitle == "Current Online Users" || selectedCardTitle == "Total Active Users" || selectedCardTitle == "Total Registered Users"){
+        try{
+          let url;
+          if(selectedCardTitle == "Current Online Users"){
+            url = ApiService.getAllSessionsByUsernameForCurrentOnlineUsers( item.username );
+          }else if(selectedCardTitle == "Total Active Users"){
+            url = ApiService.getAllSessionsByUsernameForThePast7Days( item.username, );
+          }else if(selectedCardTitle == "Total Registered Users"){
+            url = ApiService.getAllSessionsByUsername( item.username, );
+          }
+          const { data } = await url;
+          this.secondaryModalTitle = `User Session Details for ${item.username}`;
+          this.secondaryModalItems = data.userSessions|| [];
+          this.secondaryModalHeaders = [
+            { text: "Session ID", value: "acctSessionId" },
+            { text: "Start Time", value: "startTime" },
+            { text: "Duration", value: "duration" },
+            { text: "Bandwidth Used", value: "bandwidthUsage" },
+            { text: "Device", value: "callingStationId" },
+            { text: "AP ID", value: "calledStationId" },
+          ];
+          // console.log("Fetched data:", this.secondaryModalItems);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(selectedCardTitle == "Current Online APs" || selectedCardTitle == "Total Active APs" || selectedCardTitle == "Total Inactive APs"){
+        try{
+          let url;
+          if(selectedCardTitle == "Current Online APs"){
+            url = ApiService.getCurrentOnlineApForTheLast30MinsByApId( item.calledStationId );
+          }else if(selectedCardTitle == "Total Active APs"){
+            url = ApiService.getAllActiveApForTheLast7DaysByApId( item.calledStationId );
+          }else if(selectedCardTitle == "Total Inactive APs"){
+            url = ApiService.getAllInActiveApForTheLast7DaysByApId( item.calledStationId );
+          }
+          const { data } = await url;
+          this.secondaryModalTitle = `Access Point Session Details for ${this.formatApId(item.calledStationId)}`;
+          this.secondaryModalItems = (Object.values(data)[0] || []).map(user => ({
+            ...user,
+            calledStationId: item.calledStationId
+          }));
+          this.secondaryModalHeaders = [
+            { text: "User", value: "userName" },
+            { text: "Total Sessions", value: "totalSessions" },
+            { text: "total Time", value: "totalTime" },
+            { text: "Total Bandwidth", value: "totalBandwidth" },
+            { text: "avg. Session Length", value: "avgSessionLength" },
+          ];
+          // console.log("Fetched data:", this.secondaryModalItems);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }
+    },
+    async openTertiaryModal(item, selectedCardTitle) {
+      // console.log("openTertiaryModal:", item.username);
+      this.showTertiaryModal = true;
+      this.fetchingData = true;
+      
+      if(selectedCardTitle == "Current Online APs"){
+        try{
+          console.log("Fetching tertiary modal for:", item.calledStationId, item.userName);
+          const { data } = await ApiService.getSessionForCurrentOnlineUsersByUsernameAndApId( item.calledStationId, item.userName );
+
+          this.tertiaryModalTitle = `User Session Details for ${item.userName}`;
+          this.tertiaryModalItems = data.currentOnlineApByUserAndApId || [];
+          this.tertiaryModalHeaders = [
+            { text: "Session ID", value: "acctSessionId" },
+            { text: "Start Time", value: "startTime" },
+            { text: "Duration", value: "duration" },
+            { text: "Bandwidth", value: "bandwidthUsage" },
+            { text: "Device", value: "callingStationId" },
+            { text: "AP ID", value: "calledStationId" },
+          ];
+          // console.log("Fetched data:", this.tertiaryModalItems);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }
+    },
+    //TODO: implement pagination in modal
+    async fetchRows(page) {
+      this.selectedCard.page = page;
+      await this.openModal(this.selectedCard);
+    },
     formatTimestamp(timestamp) {
       if (!timestamp) return "N/A";
       const date = new Date(timestamp * 1000);
@@ -999,117 +1197,6 @@ export default {
       const part = value.split(':')[0];
       const upper = part.toUpperCase();
       return upper.match(/.{1,2}/g).join(':');
-    },
-    async openModal(card) {
-      // console.log("Fetching rows for card:", card);
-      // const limit = Number(card?.itemsPerPage || 10);
-      // const offset = Number(((card?.page || 1) - 1) * limit);
-      const limit = 100;
-      const offset = 0;
-      this.selectedCard = card;
-      this.searchByUsername = "";
-      this.fetchingData = true;
-      this.rows = [];
-      this.showModal = true;
-      
-      if(this.selectedCard.title == "Current Online Users"){
-        try{
-          const { data } = await ApiService.getAllCurrentOnlineUserDetails({ limit , offset });
-          const { data: count } = await ApiService.getCountForAllCurrentOnlineUsers();
-          const totalRows = count.totalCount || 0;
-          const pageCount = Math.ceil(totalRows / limit);
-          this.selectedCard.totalRows = totalRows;
-          this.totalPageCount = pageCount || 1;
-          this.rows = data.currentOnlineUsers || [];
-          this.rowsKey = Date.now();
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          console.error("Error fetching detailed data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(this.selectedCard.title == "Total Active Users" || this.selectedCard.title == "Total Registered Users"){
-        try{
-          let url1, url2;
-          if(this.selectedCard.title == "Total Registered Users"){
-            url1 = await ApiService.getAllRegisteredUsersWithSessions({ limit, offset });
-            url2 = await ApiService.getCountForAllRegisteredUsersWithSessions();
-          }else if(this.selectedCard.title == "Total Active Users"){
-            url1 = await ApiService.getAllActiveUsersForThePast7Days({ limit, offset });
-            url2 = await ApiService.getCountForAllActiveUsersForThePast7Days();
-          }
-          const { data } = await url1;
-          const { data: count } = await url2;
-          const totalRows = count.totalCount || 0;
-          const pageCount = Math.ceil(totalRows / limit);
-          this.rows = Object.values(data)[0] || [];
-          this.selectedCard.totalRows = totalRows;
-          this.totalPageCount = pageCount || 1;
-          this.rowsKey = Date.now();
-
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          console.error("Error fetching detailed data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }
-    },
-    async openSecondaryModal(item, selectedCardTitle) {
-      // console.log("openSecondaryModal:", item.username);
-      this.showSecondaryModal = true;
-      this.fetchingData = true;
-      
-      if(selectedCardTitle == "Current Online Users"){
-        try{
-          const { data } = await ApiService.getUserSessions({ username: item.username });
-          this.secondaryModalTitle = `User Session Details for ${item.username}`;
-          this.secondaryModalItems = data.userSessions || [];
-          this.secondaryModalHeaders = [
-            { text: "Session ID", value: "acctSessionId" },
-            { text: "Start Time", value: "startTime" },
-            { text: "Duration", value: "duration" },
-            { text: "Bandwidth", value: "bandwidthUsage" },
-            { text: "Calling Station", value: "callingStationId" },
-            { text: "Called Station", value: "calledStationId" },
-          ];
-          // console.log("Fetched user session details:", this.secondaryModalItems);
-        } catch (error) {
-          console.error("Error fetching user session details:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(selectedCardTitle == "Total Active Users" || selectedCardTitle == "Total Registered Users"){
-        try{
-          let url;
-          if(selectedCardTitle == "Total Active Users"){
-            url = ApiService.getAllSessionsByUsernameForLast7Days({ username: item.username, limit: 100, offset: 0 });
-          }else if(selectedCardTitle == "Total Registered Users"){
-            url = ApiService.getAllSessionsByUsername({ username: item.username, limit: 100, offset: 0 });
-          }
-          const { data } = await url;
-          this.secondaryModalTitle = `User Session Details for ${item.username}`;
-          this.secondaryModalItems = data.userSessions|| [];
-          this.secondaryModalHeaders = [
-            { text: "Session ID", value: "acctSessionId" },
-            { text: "Start Time", value: "startTime" },
-            { text: "Duration", value: "duration" },
-            { text: "Bandwidth Used", value: "bandwidthUsage" },
-            { text: "Device", value: "callingStationId" },
-            { text: "AP ID", value: "calledStationId" },
-          ];
-          // console.log("Fetched data:", this.secondaryModalItems);
-        } catch (error) {
-          console.error("Error fetching user session details:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }
-    },
-    //TODO: implement pagination in modal
-    async fetchRows(page) {
-      this.selectedCard.page = page;
-      await this.openModal(this.selectedCard);
     },
   },
   // TODO: optimize by fetching data only when modal is opened
