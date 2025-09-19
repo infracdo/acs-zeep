@@ -189,7 +189,7 @@ class ApiService {
   }
   
   getOnlineRegisteredAPs() {
-    return http.get('/api/radius/access-points-registered');
+    return http.get('/api/radius/access-points-online');
   }
   
   getOfflineRegisteredAPs() {
@@ -197,11 +197,15 @@ class ApiService {
   }
 
   getAllRegisteredAPs() {
-    return http.get('/api/radius/access-points-zeep');
+    return http.get('/api/radius/access-points-registered');
   }
 
   getAllRogueAPs() {
     return http.get('/api/radius/access-points-rogue');
+  }
+
+  getRegisteredDevicesByApId(apId) {
+    return http.get(`/api/radius/access-points-offline-registered/${apId}`);
   }
   
 }
