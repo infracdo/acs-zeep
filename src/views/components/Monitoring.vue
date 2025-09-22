@@ -78,7 +78,7 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}">
+            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -314,20 +314,23 @@
           {{ selectedCard?.title }}
           <v-spacer></v-spacer>
           <v-text-field
-            v-model="searchByUsername"
-            label="Search By Username"
+            v-model="searchQuery"
+            label="Search"
             dense
             outlined
             hide-details
             prepend-inner-icon="mdi-magnify"
             style="max-width: 300px"
           />
+          <v-btn icon @click="showModal = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </v-card-title>
         
         <v-card-text>
           <div v-if="selectedCard" style="margin-top: 16px;">
             <v-data-table
-              :search="searchByUsername"
+              :search="searchQuery"
               :headers="selectedCard.headers"
               :loading="fetchingData"
               loading-text="Fetching... Please wait"
@@ -338,7 +341,7 @@
             >
               <template v-slot:no-data>
                 <div v-if ="!fetchingData">
-                  <v-alert type="info">No data available</v-alert>
+                  No data available
                 </div>
               </template>
             
@@ -346,6 +349,7 @@
                 <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
                   {{ formatApId(item.calledStationId) }}
                 </div>
+
                 
                 <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs' || selectedCard?.title == 'Total Active APs' || selectedCard?.title == 'Total Inactive APs')">
                   <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
@@ -353,7 +357,7 @@
                   </span>
                 </div>
               </template>
-                
+              
               <template v-slot:item.callingStationId="{ item }">
                 <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
                   {{ formatMacAddress(item.callingStationId) }}
@@ -363,6 +367,18 @@
               <template v-slot:item.username="{ item }">
                 <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
                   {{ item.username || 'N/A' }}
+                </span>
+              </template>
+
+              <template v-slot:item.device_name="{ item }">
+                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                  {{ item.device_name || 'N/A' }}
+                </span>
+              </template>
+              
+              <template v-slot:item.status="{ item }">
+                <span :style="{ color: statusColor(item.status) }">
+                  {{ item.status }}
                 </span>
               </template>
             </v-data-table>
@@ -377,7 +393,12 @@
 
     <v-dialog v-model="showSecondaryModal" max-width="1500px" :style="{ 'z-index': 2000 }">
       <v-card>
-        <v-card-title>{{ secondaryModalTitle }}</v-card-title>
+        <v-card-title style="display: flex; align-items: center; justify-content: space-between;">
+          <span>{{ secondaryModalTitle }}</span>
+          <v-btn icon @click="showSecondaryModal = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
         <v-card-text>
           <v-data-table
             :headers="secondaryModalHeaders"
@@ -408,6 +429,12 @@
                 {{ item.userName || 'N/A' }}
               </div>
             </template>
+            
+            <template v-slot:item.status="{ item }">
+              <span :style="{ color: statusColor(item.status) }">
+                {{ item.status }}
+              </span>
+            </template>
           </v-data-table>
         </v-card-text>
         <!-- <v-card-actions>
@@ -418,7 +445,12 @@
 
     <v-dialog v-model="showTertiaryModal" max-width="1800px" :style="{ 'z-index': 2000 }">
       <v-card>
-        <v-card-title>{{ tertiaryModalTitle }}</v-card-title>
+        <v-card-title style="display: flex; align-items: center; justify-content: space-between;">
+          <span>{{ tertiaryModalTitle }}</span>
+          <v-btn icon @click="showTertiaryModal = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
         <v-card-text>
           <v-data-table
             :headers="tertiaryModalHeaders"
@@ -457,7 +489,7 @@ export default {
       showModal: false,
       showSecondaryModal: false,
       showTertiaryModal: false,
-      searchByUsername: "",
+      searchQuery: "",
       selectedCard: null,
       rowsKey: 0,
       rows: [],
@@ -476,8 +508,8 @@ export default {
           totalPageCount: 0,
           headers: [
             { text: "User", value: "username" },
-            { text: "Active Sessions", value: "total_active_session_count" },
-            { text: "Total Duration", value: "total_session_duration" },
+            { text: "Active Sessions", value: "totalActiveSessionCount" },
+            { text: "Total Duration", value: "totalSessionDuration" },
             { text: "Total Bandwidth Usage", value: "totalBandwidthUsage" },
           ],
         },
@@ -574,8 +606,40 @@ export default {
         {
           title: "Total Device for Deployment",
           value: "-",
+          color: "#4B8F78",
+          key: "allConnectedAPData",
+          headers: [
+            { text: "Serial Number", value: "serial_number" },
+            { text: "Group", value: "parent" },
+            { text: "Mac Address", value: "mac_address" },
+            { text: "Status", value: "status" },
+          ],
+        },
+        {
+          title: "Total Down AP",
+          value: "-",
+          color: "#2C665A",
+          key: "allConnectedAPData",
+          headers: [
+            { text: "Device Name", value: "device_name" },
+            { text: "Model", value: "model" },
+            { text: "Serial Number", value: "serial_number" },,
+            { text: "Status", value: "status" },
+          ],
+        },
+        {
+          title: "Total Deployed AP",
+          value: "-",
           color: "#0E3C3C",
           key: "allConnectedAPData",
+          headers: [
+            { text: "Device Name", value: "device_name" },
+            { text: "Model", value: "model" },
+            { text: "Serial Number", value: "serial_number" },
+            { text: "Group", value: "parent" },
+            { text: "Mac Address", value: "mac_address" },
+            { text: "Status", value: "status" },
+          ],
         },
       ],
       cardsTotal: [
@@ -924,10 +988,10 @@ export default {
         this.rogueAPRegisteredData = rogueAPsResponse.data;
 
         this.cardsAcsAP[0].value = this.rogueAPRegisteredData.length;
+        this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length;
+        this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
         // this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
-        // this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length; 
-        // this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
-
+        
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
         // this.currentConnectedAPs = currentConnectedAPs.data.data;
@@ -1023,7 +1087,7 @@ export default {
     async openModal(card) {
       // console.log("Fetching rows for card:", card);
       this.selectedCard = card;
-      this.searchByUsername = "";
+      this.searchQuery = "";
       this.fetchingData = true;
       this.rows = [];
       this.showModal = true;
@@ -1068,6 +1132,26 @@ export default {
           }
           const { data } = await url;
           this.rows = Object.values(data)[0] || [];
+          this.rowsKey = Date.now();
+          // console.log("Fetched data:", data);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
+      }else if(this.selectedCard.title == "Total Device for Deployment" || this.selectedCard.title == "Total Down AP" || this.selectedCard.title == "Total Deployed AP"){
+        // console.log("Fetching  data");
+        try{
+          let url;
+          if(this.selectedCard.title == "Total Device for Deployment"){
+            url = await ApiService.getAllRogueAPs();
+          }else if(this.selectedCard.title == "Total Down AP"){
+            url = await ApiService.getOfflineRegisteredAPs();
+          }else if(this.selectedCard.title == "Total Deployed AP"){
+            url = await ApiService.getAllRegisteredAPs();
+          }
+          const { data } = await url;
+          this.rows = data;
           this.rowsKey = Date.now();
           // console.log("Fetched data:", data);
         } catch (error) {
@@ -1138,6 +1222,34 @@ export default {
         } finally {
           this.fetchingData = false;
         }
+      }else if(selectedCardTitle == "Total Down AP"){
+        try{
+          let url;
+          if(selectedCardTitle == "Total Down AP"){
+            url = ApiService.getRegisteredDevicesByApId( item.mac_address );
+          }
+          const { data } = await url;
+          this.secondaryModalTitle = `Offline Access Point Details for ${item.mac_address}`;
+          this.secondaryModalItems = data.map(ap => ({
+            ...ap,
+            macAddress: item.mac_address
+          }));
+          this.secondaryModalHeaders = [
+            { text: "Device Name", value: "device_name" },
+            { text: "Model", value: "model" },
+            { text: "Serial Number", value: "serial_number" },
+            { text: "Group", value: "parent" },
+            { text: "Mac Address", value: "mac_address" },
+            { text: "Status", value: "status" },
+            { text: "Date Offline", value: "date_offline" },
+            { text: "Location", value: "location" },
+          ];
+          // console.log("Fetched data:", this.secondaryModalItems);
+        } catch (error) {
+          // console.error("Error fetching data:", error);
+        } finally {
+          this.fetchingData = false;
+        }
       }
     },
     async openTertiaryModal(item, selectedCardTitle) {
@@ -1197,6 +1309,11 @@ export default {
       const part = value.split(':')[0];
       const upper = part.toUpperCase();
       return upper.match(/.{1,2}/g).join(':');
+    },
+    statusColor(status) {
+      if (status.toLowerCase() === 'online') return 'green';
+      if (status.toLowerCase() === 'offline') return 'red';
+      return 'gray';
     },
   },
   // TODO: optimize by fetching data only when modal is opened
