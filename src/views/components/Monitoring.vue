@@ -101,6 +101,39 @@
       </v-card>
       <v-card class="pa-4 elevation-0">
         <v-card-title class="pa-0 pb-2">
+          AP for Deployment
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(card, index) in cardsAcsDownAP"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
+              <v-card-title
+                class="font-weight-bold text-h3 text-right"
+                style="text-align: right; display: block; color: white"
+              >
+                {{
+                  card.value !== null && card.value !== undefined
+                    ? card.value
+                    : "-"
+                }}
+              </v-card-title>
+              <v-card-text
+                class="text-right text-subtitle-2"
+                style="color: white"
+              >
+                {{ card.title }}
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-card class="pa-4 elevation-0">
+        <v-card-title class="pa-0 pb-2">
           Today’s Overview
         </v-card-title>
         <v-row>
@@ -326,62 +359,106 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
+
+        <div v-if="enableFirstModalTab">
+          <v-tabs v-model="activeFirstModalTab" :background-color="selectedCard?.color" :slider-color="'white'">
+            <v-tab :style="{ color: 'white' }" @click="showFirstModalTable = true; showFirstModalMap = false">Data</v-tab>
+            <v-tab :style="{ color: 'white' }" @click="showFirstModalTable = false; showFirstModalMap = true">Location</v-tab>
+          </v-tabs>
+        </div>
         
         <v-card-text>
           <div v-if="selectedCard" style="margin-top: 16px;">
-            <v-data-table
-              :search="searchQuery"
-              :headers="selectedCard.headers"
-              :loading="fetchingData"
-              loading-text="Fetching... Please wait"
-              :key="rowsKey"
-              :items="rows"
-              :items-per-page="10"
-              class="solid-shadow"
-            >
-              <template v-slot:no-data>
-                <div v-if ="!fetchingData">
-                  No data available
-                </div>
-              </template>
-            
-              <template v-slot:item.calledStationId="{ item }">
-                <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
-                  {{ formatApId(item.calledStationId) }}
-                </div>
 
-                
-                <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs' || selectedCard?.title == 'Total Active APs' || selectedCard?.title == 'Total Inactive APs')">
-                  <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+            <div v-if="showFirstModalTable" style="margin-top: 16px;">
+              <v-data-table
+                :search="searchQuery"
+                :headers="selectedCard.headers"
+                :loading="fetchingData"
+                loading-text="Fetching... Please wait"
+                :key="rowsKey"
+                :items="rows"
+                :items-per-page="10"
+                class="solid-shadow"
+              >
+                <template v-slot:no-data>
+                  <div v-if ="!fetchingData">
+                    No data available
+                  </div>
+                </template>
+              
+                <template v-slot:item.calledStationId="{ item }">
+                  <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
                     {{ formatApId(item.calledStationId) }}
-                  </span>
-                </div>
-              </template>
-              
-              <template v-slot:item.callingStationId="{ item }">
-                <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
-                  {{ formatMacAddress(item.callingStationId) }}
-                </div>
-              </template>
-                
-              <template v-slot:item.username="{ item }">
-                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                  {{ item.username || 'N/A' }}
-                </span>
-              </template>
+                  </div>
 
-              <template v-slot:item.device_name="{ item }">
-                <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                  {{ item.device_name || 'N/A' }}
-                </span>
-              </template>
-              
-              <template v-slot:item.status="{ item }">
-                <span :style="{ color: statusColor(item.status) }">
-                  {{ item.status }}
-                </span>
-              </template>
-            </v-data-table>
+                  
+                  <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs' || selectedCard?.title == 'Total Active APs' || selectedCard?.title == 'Total Inactive APs')">
+                    <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                      {{ formatApId(item.calledStationId) }}
+                    </span>
+                  </div>
+                </template>
+                
+                <template v-slot:item.callingStationId="{ item }">
+                  <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
+                    {{ formatMacAddress(item.callingStationId) }}
+                  </div>
+                </template>
+                  
+                <template v-slot:item.username="{ item }">
+                  <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                    {{ item.username || 'N/A' }}
+                  </span>
+                </template>
+
+                <template v-slot:item.device_name="{ item }">
+                  <div v-if="selectedCard && (selectedCard?.title == 'Total Down AP')">
+                    <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                      {{ item.device_name || 'N/A' }}
+                    </span>
+                  </div>
+
+                  <div v-if="selectedCard && (selectedCard?.title != 'Total Down AP')">
+                      {{ item.device_name || 'N/A' }}
+                  </div>
+                </template>
+                
+                <template v-slot:item.status="{ item }">
+                  <span :style="{ color: statusColor(item.status) }">
+                    {{ item.status }}
+                  </span>
+                </template>
+
+                <template v-slot:item.coordinates="{ item }">
+                  <span class="text-blue-600 cursor-pointer underline"@click="focusOnMarkerForFirstModal(item)" style="cursor: pointer; color: #1976d2;">
+                    {{ item.coordinates }}
+                  </span>
+                </template>
+              </v-data-table>
+            </div>
+          </div>
+
+          <div v-if="enableFirstModalTab && showFirstModalMap" style="height: 700px; width: 100%; margin-top: 16px;">
+            <l-map
+              ref="mapRef"
+              :zoom="6"
+              :center="[12.2, 121.7740]"
+              style="height: 100%; width: 100%;"
+            >
+              <l-tile-layer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <l-marker
+                v-for="marker in mapMarkers"
+                :key="marker.id"
+                :lat-lng="[marker.lat, marker.lng]"
+                :icon="redMarkerIcon"
+              >
+                <l-popup>{{ marker.name }}</l-popup>
+              </l-marker>
+            </l-map>
           </div>
 
           <!-- <v-card-actions>
@@ -390,7 +467,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-
+    
     <v-dialog v-model="showSecondaryModal" max-width="1500px" :style="{ 'z-index': 2000 }">
       <v-card>
         <v-card-title style="display: flex; align-items: center; justify-content: space-between;">
@@ -399,43 +476,79 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
+
+        <div v-if="enableSecondaryModalTab">
+          <v-tabs v-model="activeSecondaryModalTab" :background-color="selectedCard?.color" :slider-color="'white'">
+            <v-tab :style="{ color: 'white' }" @click="showSecondaryModalTable = true; showSecondaryModalMap = false">Data</v-tab>
+            <v-tab :style="{ color: 'white' }" @click="showSecondaryModalTable = false; showSecondaryModalMap = true">Location</v-tab>
+          </v-tabs>
+        </div>
+
         <v-card-text>
-          <v-data-table
-            :headers="secondaryModalHeaders"
-            :loading="fetchingData"
-            loading-text="Fetching... Please wait"
-            :items="secondaryModalItems"
-            :items-per-page="10"
-            class="solid-shadow"
-          >
-            <template v-slot:no-data>
-              <div>No data available</div>
-            </template>
-            <template v-slot:item.calledStationId="{ item }">
-              {{ formatApId(item.calledStationId) }}
-            </template>
+          
+          <div v-if="showSecondaryModalTable" style="margin-top: 16px;">
+            <v-data-table
+              :headers="secondaryModalHeaders"
+              :loading="fetchingData"
+              loading-text="Fetching... Please wait"
+              :items="secondaryModalItems"
+              :items-per-page="10"
+              class="solid-shadow"
+            >
+              <template v-slot:no-data>
+                <div>No data available</div>
+              </template>
+              <template v-slot:item.calledStationId="{ item }">
+                {{ formatApId(item.calledStationId) }}
+              </template>
 
-            <template v-slot:item.callingStationId="{ item }">
-              {{ formatMacAddress(item.callingStationId) }}
-            </template>
+              <template v-slot:item.callingStationId="{ item }">
+                {{ formatMacAddress(item.callingStationId) }}
+              </template>
 
-            <template v-slot:item.userName="{ item }">
-              <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs')">
-                <span @click.stop.prevent="openTertiaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+              <template v-slot:item.userName="{ item }">
+                <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs')">
+                  <span @click.stop.prevent="openTertiaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                    {{ item.userName || 'N/A' }}
+                  </span>
+                </div>
+                <div v-else>
                   {{ item.userName || 'N/A' }}
+                </div>
+              </template>
+              
+              <template v-slot:item.status="{ item }">
+                <span :style="{ color: statusColor(item.status) }">
+                  {{ item.status }}
                 </span>
-              </div>
-              <div v-else>
-                {{ item.userName || 'N/A' }}
-              </div>
-            </template>
-            
-            <template v-slot:item.status="{ item }">
-              <span :style="{ color: statusColor(item.status) }">
-                {{ item.status }}
-              </span>
-            </template>
-          </v-data-table>
+              </template>
+              
+              <template v-slot:item.coordinates="{ item }">
+                <span class="text-blue-600 cursor-pointer underline"@click="focusOnMarkerForSecondModal(item)" style="cursor: pointer; color: #1976d2;">
+                  {{ item.coordinates }}
+                </span>
+              </template>
+            </v-data-table>
+          </div>
+
+          <div v-if="enableSecondaryModalTab && showSecondaryModalMap" style="height: 700px; width: 100%; margin-top: 16px;">
+            <l-map
+              ref="secondaryMapRef"
+              :zoom="6"
+              :center="[12.2, 121.7740]"
+              style="height: 100%; width: 100%;"
+            >
+              <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+              <l-marker
+                v-for="marker in secondaryMapMarkers"
+                :key="marker.id"
+                :lat-lng="[marker.lat, marker.lng]"
+                :icon="redMarkerIcon"
+              >
+                <l-popup>{{ marker.name }}</l-popup>
+              </l-marker>
+            </l-map>
+          </div>
         </v-card-text>
         <!-- <v-card-actions>
           <v-btn text @click="showSecondaryModal = false">Close</v-btn>
@@ -479,12 +592,21 @@
 </template>
 
 <script>
+import L from "leaflet";
 import ApiService from "../../api.service";
+
 
 export default {
   name: "MonitoringDashboard",
   data() {
     return {
+      showFirstModalTable: true,
+      showFirstModalMap: false,
+      enableFirstModalTab: false,
+      showSecondaryModalTable: true,
+      showSecondaryModalMap: false,
+      enableSecondaryModalTab: false,
+
       fetchingData: false,
       showModal: false,
       showSecondaryModal: false,
@@ -555,6 +677,7 @@ export default {
             { text: "Total Bandwidth", value: "totalBandwidth" },
             { text: "Avg. Session Duration", value: "avgSessionDuration" },
             { text: "Peak Time", value: "peakHour" },
+            { text: "AP Location", value: "coordinates" },
           ],
         },
         {
@@ -568,6 +691,7 @@ export default {
             { text: "Total Bandwidth", value: "totalBandwidth" },
             { text: "Avg. Session Duration", value: "avgSessionDuration" },
             { text: "Peak Time", value: "peakHour" },
+            { text: "AP Location", value: "coordinates" },
           ],
         },
         {
@@ -581,6 +705,7 @@ export default {
             { text: "Total Bandwidth", value: "totalBandwidth" },
             { text: "Avg. Session Duration", value: "avgSessionDuration" },
             { text: "Peak Time", value: "peakHour" },
+            { text: "AP Location", value: "coordinates" },
           ],
         },
       ],
@@ -604,15 +729,18 @@ export default {
         //   key: "allConnectedAPData",
         // },
         {
-          title: "Total Device for Deployment",
+          title: "Total Online AP",
           value: "-",
           color: "#4B8F78",
           key: "allConnectedAPData",
           headers: [
+            { text: "Device Name", value: "device_name" },
+            { text: "Model", value: "model" },
             { text: "Serial Number", value: "serial_number" },
             { text: "Group", value: "parent" },
             { text: "Mac Address", value: "mac_address" },
             { text: "Status", value: "status" },
+            { text: "AP Location", value: "coordinates" },
           ],
         },
         {
@@ -639,6 +767,22 @@ export default {
             { text: "Group", value: "parent" },
             { text: "Mac Address", value: "mac_address" },
             { text: "Status", value: "status" },
+            { text: "AP Location", value: "coordinates" },
+          ],
+        },
+      ],
+      cardsAcsDownAP: [
+        {
+          title: "Total Device for Deployment",
+          value: "-",
+          color: "#15676b",
+          key: "allDeviceForDeploymentData",
+          headers: [
+            { text: "Serial Number", value: "serial_number" },
+            { text: "Group", value: "parent" },
+            { text: "Mac Address", value: "mac_address" },
+            { text: "Status", value: "status" },
+            // { text: "AP Location", value: "coordinates" },
           ],
         },
       ],
@@ -817,7 +961,16 @@ export default {
       selectedAccessPoint: null,
       loading: false,
       fetchInterval: null,
+      redMarkerIcon: L.icon({
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
     };
+    
   },
   computed: {
     isAccessPointDropdownDisabled() {
@@ -825,6 +978,34 @@ export default {
         !this.accessPointOptions.length ||
         (this.accessPointOptions.length === 1 && this.accessPointOptions[0].value === null)
       );
+    },
+    mapMarkers() {
+      if (!this.rows || !this.rows.length) return [];
+      return this.rows
+        .filter(row => row.coordinates)
+        .map(row => {
+          const [lng, lat] = row.coordinates.split(",").map(Number);
+          return {
+            id: row.calledStationId || row.username || row.device_name,
+            name: row.calledStationId || row.username || row.device_name,
+            lat,
+            lng
+          };
+        });
+    },
+    secondaryMapMarkers() {
+      if (!this.secondaryModalItems || !this.secondaryModalItems.length) return [];
+      return this.secondaryModalItems
+        .filter(row => row.coordinates)
+        .map(row => {
+          const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+          return {
+            id: row.calledStationId || row.username || row.acctSessionId,
+            name: row.calledStationId || row.username || row.acctSessionId,
+            lat,
+            lng
+          };
+        });
     },
   },
   async created() {
@@ -982,15 +1163,17 @@ export default {
         // Store all connected users data
         this.allOnlineUsersData = onlineUsersPerApResponse.data;
 
-        this.onlineAPRegisteredData = onlineAPsResponse.data;
-        this.offlineAPRegisteredData = offlineAPsResponse.data;
-        this.totalRegisteredAPData = registeredAPsResponse.data;
-        this.rogueAPRegisteredData = rogueAPsResponse.data;
-
-        this.cardsAcsAP[0].value = this.rogueAPRegisteredData.length;
+        this.onlineAPRegisteredData = onlineAPsResponse.data.registeredAPs;
+        this.offlineAPRegisteredData = offlineAPsResponse.data.registeredAPs;
+        this.totalRegisteredAPData = registeredAPsResponse.data.registeredAPs;
+        
+        this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
         this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length;
         this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
-        // this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
+        
+        this.rogueAPRegisteredData = rogueAPsResponse.data.rogueAPs;
+        
+        this.cardsAcsDownAP[0].value = this.rogueAPRegisteredData.length;
         
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
@@ -1085,86 +1268,52 @@ export default {
       this.connectedUsers = Array.from(uniqueUsersMap.values());
     },
     async openModal(card) {
-      // console.log("Fetching rows for card:", card);
       this.selectedCard = card;
       this.searchQuery = "";
       this.fetchingData = true;
       this.rows = [];
       this.showModal = true;
-      
-      if(this.selectedCard.title == "Current Online Users"){
-        try{
-          const { data } = await ApiService.getAllCurrentOnlineUserDetails({});
-          this.rows = data.currentOnlineUsers || [];
-          this.rowsKey = Date.now();
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(this.selectedCard.title == "Total Active Users" || this.selectedCard.title == "Total Registered Users"){
-        try{
-          let url;
-          if(this.selectedCard.title == "Total Registered Users"){
-            url = await ApiService.getAllRegisteredUsersWithSessions();
-          }else if(this.selectedCard.title == "Total Active Users"){
-            url = await ApiService.getAllActiveUsersForThePast7Days();
-          }
-          const { data } = await url;
-          this.rows = Object.values(data)[0] || [];
-          this.rowsKey = Date.now();
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(this.selectedCard.title == "Current Online APs" || this.selectedCard.title == "Total Active APs" || this.selectedCard.title == "Total Inactive APs"){
-        try{
-          let url;
-          if(this.selectedCard.title == "Current Online APs"){
-            url = await ApiService.getAllCurrentOnlineApForTheLast30Mins();
-          }else if(this.selectedCard.title == "Total Active APs"){
-            url = await ApiService.getAllActiveApForTheLast7Days();
-          }else if(this.selectedCard.title == "Total Inactive APs"){
-            url = await ApiService.getAllInactiveApForMoreThan7Days();
-          }
-          const { data } = await url;
-          this.rows = Object.values(data)[0] || [];
-          this.rowsKey = Date.now();
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(this.selectedCard.title == "Total Device for Deployment" || this.selectedCard.title == "Total Down AP" || this.selectedCard.title == "Total Deployed AP"){
-        // console.log("Fetching  data");
-        try{
-          let url;
-          if(this.selectedCard.title == "Total Device for Deployment"){
-            url = await ApiService.getAllRogueAPs();
-          }else if(this.selectedCard.title == "Total Down AP"){
-            url = await ApiService.getOfflineRegisteredAPs();
-          }else if(this.selectedCard.title == "Total Deployed AP"){
-            url = await ApiService.getAllRegisteredAPs();
-          }
-          const { data } = await url;
-          this.rows = data;
-          this.rowsKey = Date.now();
-          // console.log("Fetched data:", data);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
+      this.showFirstModalTable = true;
+      this.showFirstModalMap = false;
+      this.activeFirstModalTab = 0;
+      this.enableFirstModalTab = card.headers.some(h => h.value === "coordinates");
+
+      const apiMap = {
+        "Current Online Users": ApiService.getAllCurrentOnlineUserDetails,
+        "Total Registered Users": ApiService.getAllRegisteredUsersWithSessions,
+        "Total Active Users": ApiService.getAllActiveUsersForThePast7Days,
+        "Current Online APs": ApiService.getAllCurrentOnlineApForTheLast30Mins,
+        "Total Active APs": ApiService.getAllActiveApForTheLast7Days,
+        "Total Inactive APs": ApiService.getAllInactiveApForMoreThan7Days,
+        "Total Device for Deployment": ApiService.getAllRogueAPs,
+        "Total Down AP": ApiService.getOfflineRegisteredAPs,
+        "Total Deployed AP": ApiService.getAllRegisteredAPs,
+        "Total Online AP": ApiService.getOnlineRegisteredAPs,
+      };
+
+      try {
+        const apiCall = apiMap[card.title];
+        if (!apiCall) throw new Error(`No API mapped for card: ${card.title}`);
+
+        const { data } = await apiCall();
+        this.rows = Object.values(data)[0] || data.row || [];
+        this.rowsKey = Date.now();
+        // console.log("Fetched data:", data);
+      } catch (error) {
+        // console.error("Error fetching data:", error);
+      } finally {
+        this.fetchingData = false;
       }
     },
     async openSecondaryModal(item, selectedCardTitle) {
       // console.log("openSecondaryModal:", item.username);
       this.showSecondaryModal = true;
+      this.secondaryModalItems = [];
       this.fetchingData = true;
+      this.showSecondaryModalTable = true;
+      this.showSecondaryModalMap = false;
+      this.activeSecondaryModalTab = 0;
+      this.enableSecondaryModalTab = this.secondaryModalHeaders.some(h => h.value === "coordinates");
       
       if(selectedCardTitle == "Current Online Users" || selectedCardTitle == "Total Active Users" || selectedCardTitle == "Total Registered Users"){
         try{
@@ -1186,6 +1335,7 @@ export default {
             { text: "Bandwidth Used", value: "bandwidthUsage" },
             { text: "Device", value: "callingStationId" },
             { text: "AP ID", value: "calledStationId" },
+            { text: "AP Location", value: "coordinates" },
           ];
           // console.log("Fetched data:", this.secondaryModalItems);
         } catch (error) {
@@ -1226,14 +1376,18 @@ export default {
         try{
           let url;
           if(selectedCardTitle == "Total Down AP"){
+            url = ApiService.getRegisteredOfflineDevicesByApId( item.mac_address );
+          } /*else if(selectedCardTitle == "Total Device for Deployment"){
+            url = ApiService.getRogueDevicesByApId( item.mac_address );
+          }else if(selectedCardTitle == "Total Deployed AP"){
             url = ApiService.getRegisteredDevicesByApId( item.mac_address );
-          }
+          } */
           const { data } = await url;
-          this.secondaryModalTitle = `Offline Access Point Details for ${item.mac_address}`;
-          this.secondaryModalItems = data.map(ap => ({
-            ...ap,
-            macAddress: item.mac_address
-          }));
+          this.secondaryModalTitle = `${selectedCardTitle} Details for ${item.mac_address}`;
+          this.secondaryModalItems = data.registeredAPs || []
+          // this.secondaryModalItems = (data.registeredAPs || []).map(ap =>  ({
+          //   ...ap,
+          // }));
           this.secondaryModalHeaders = [
             { text: "Device Name", value: "device_name" },
             { text: "Model", value: "model" },
@@ -1242,7 +1396,8 @@ export default {
             { text: "Mac Address", value: "mac_address" },
             { text: "Status", value: "status" },
             { text: "Date Offline", value: "date_offline" },
-            { text: "Location", value: "location" },
+            // { text: "Location", value: "location" },
+            { text: "Location", value: "coordinates" },
           ];
           // console.log("Fetched data:", this.secondaryModalItems);
         } catch (error) {
@@ -1256,6 +1411,7 @@ export default {
       // console.log("openTertiaryModal:", item.username);
       this.showTertiaryModal = true;
       this.fetchingData = true;
+      this.tertiaryModalItems = [];
       
       if(selectedCardTitle == "Current Online APs"){
         try{
@@ -1315,6 +1471,31 @@ export default {
       if (status.toLowerCase() === 'offline') return 'red';
       return 'gray';
     },
+    focusOnMarkerForFirstModal(row) {
+      if (!row.coordinates) return;
+      const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+      this.showFirstModalMap = true;
+      this.showFirstModalTable = false;
+      this.activeFirstModalTab = 1;
+      this.$nextTick(() => {
+        if (this.$refs.mapRef) {
+          this.$refs.mapRef.mapObject.setView([lat, lng], 13);
+        }
+      });
+    },
+    focusOnMarkerForSecondModal(row) {
+      if (!row.coordinates) return;
+      const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+      this.showSecondaryModalMap = true;
+      this.showSecondaryModalTable = false;
+      this.activeSecondaryModalTab = 1;
+      this.$nextTick(() => {
+        if (this.$refs.secondaryMapRef) {
+          this.$refs.secondaryMapRef.mapObject.setView([lat, lng], 13);
+        }
+      });
+    },
+    
   },
   // TODO: optimize by fetching data only when modal is opened
   watch: {

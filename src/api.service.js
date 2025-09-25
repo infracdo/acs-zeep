@@ -104,8 +104,8 @@ class ApiService {
     return http.get('/api/radius/ap/active/count');
   }
   
-  getAllActiveApForTheLast7Days(params) {
-    return http.get('/api/radius/ap/active', { params });
+  getAllActiveApForTheLast7Days() {
+    return http.get('/api/radius/ap/active');
   }
 
   getAllActiveApForTheLast7DaysByApId(apId, params) {
@@ -189,25 +189,32 @@ class ApiService {
   }
   
   getOnlineRegisteredAPs() {
-    return http.get('/api/radius/access-points-online');
+    return http.get('/api/radius/access-points/registered', { params: { status: 'online' } });
   }
   
   getOfflineRegisteredAPs() {
-    return http.get('/api/radius/access-points-offline');
+    return http.get(`/api/radius/access-points/registered`, { params: { status: 'offline' } });
   }
 
   getAllRegisteredAPs() {
-    return http.get('/api/radius/access-points-registered');
+    return http.get('/api/radius/access-points/registered');
   }
 
   getAllRogueAPs() {
-    return http.get('/api/radius/access-points-rogue');
+    return http.get('/api/radius/access-points/rogue');
   }
 
-  getRegisteredDevicesByApId(apId) {
-    return http.get(`/api/radius/access-points-offline-registered/${apId}`);
+  getRegisteredOfflineDevicesByApId(apId){
+    return http.get(`/api/radius/access-points/registered`, { params: { status: 'offline', apId } });
   }
   
+  // getRegisteredDevicesByApId() {
+  //   return http.get(`/api/radius/access-points/registered`, { params: { apId } });
+  // }
+
+  // getRogueDevicesByApId(apId) {
+  //   return http.get(`/api/radius/access-points/rogue/{apId}`);
+  // }
 }
 /* eslint-enable class-methods-use-this */
 
