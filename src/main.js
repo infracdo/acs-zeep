@@ -1,20 +1,30 @@
 import 'normalize.css/normalize.css';
 import 'vuetify/dist/vuetify.min.css';
 
-import Vue from 'vue';
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 import axios from 'axios';
+import Vue from 'vue';
 import VueAxios from 'vue-axios';
 
-import vuetify from './plugins/vuetify';
 import i18n from './locale'; // Internationalization
+import vuetify from './plugins/vuetify';
 
 import App from './App.vue';
 import router from './router';
 import store from './store';
 
-import http, { attachAuthInterceptor } from './http-common';
+import "leaflet/dist/leaflet.css";
+
+import { attachAuthInterceptor } from './http-common';
 import './router/permission';
+
+
+import { LMap, LMarker, LPopup, LTileLayer } from "vue2-leaflet";
+
+Vue.component("l-map", LMap);
+Vue.component("l-tile-layer", LTileLayer);
+Vue.component("l-marker", LMarker);
+Vue.component("l-popup", LPopup);
 
 function scheduleTokenRefresh(keycloak) {
   const tokenParsed = keycloak.tokenParsed || {};
