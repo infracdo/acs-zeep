@@ -341,6 +341,47 @@
       </v-col>
     </v-card>
 
+    <v-card class="pa-4 mb-6" style="height: 700px;">
+      <v-card-title class="d-flex justify-space-between align-center pa-0 mb-3">
+        <span>Zeep Device Locations</span>
+        <v-btn-toggle
+          v-model="showMainMarkersMode"
+          dense
+          mandatory
+          class="ml-auto"
+        >
+          <v-btn value="all" small>All</v-btn>
+          <v-btn value="online" small>Online</v-btn>
+          <v-btn value="offline" small>Offline</v-btn>
+        </v-btn-toggle>
+      </v-card-title>
+
+      <v-card-text class="pa-0 pt-2" style="height: 94%;">
+        <l-map
+          ref="mainMapRef"
+          :zoom="6"
+          :center="[12.2, 121.7740]"
+          style="height: 100%; width: 100%;"
+        >
+          <l-tile-layer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
+          />
+          <l-marker
+            v-for="marker in mainMapMarkers"
+            :key="marker.id"
+            :lat-lng="[marker.lat, marker.lng]"
+            :icon="marker.icon"
+          >
+            <l-popup>
+              <b>MAC:</b> {{ marker.mac }} <br />
+              <b>Status:</b> {{ marker.status }}
+            </l-popup>
+          </l-marker>
+        </l-map>
+      </v-card-text>
+    </v-card>
+
     <v-dialog v-model="showModal" max-width="1400px" :style="{ 'z-index': 1400 }">
       <v-card>
         <v-card-title class="text-h6">
@@ -451,10 +492,10 @@
                 attribution="&copy; OpenStreetMap contributors"
               />
               <l-marker
-                v-for="marker in mapMarkers"
+                v-for="marker in firstMapMarkers"
                 :key="marker.id"
                 :lat-lng="[marker.lat, marker.lng]"
-                :icon="redMarkerIcon"
+                :icon="blueMarkerIcon"
               >
                 <l-popup>{{ marker.name }}</l-popup>
               </l-marker>
@@ -543,8 +584,8 @@
                 v-for="marker in secondaryMapMarkers"
                 :key="marker.id"
                 :lat-lng="[marker.lat, marker.lng]"
-                :icon="redMarkerIcon"
-              >
+                :icon="blueMarkerIcon"
+                >
                 <l-popup>{{ marker.name }}</l-popup>
               </l-marker>
             </l-map>
@@ -606,6 +647,7 @@ export default {
       showSecondaryModalTable: true,
       showSecondaryModalMap: false,
       enableSecondaryModalTab: false,
+      showMainMarkersMode: "all",
 
       fetchingData: false,
       showModal: false,
@@ -751,7 +793,7 @@ export default {
           headers: [
             { text: "Device Name", value: "device_name" },
             { text: "Model", value: "model" },
-            { text: "Serial Number", value: "serial_number" },,
+            { text: "Serial Number", value: "serial_number" },
             { text: "Status", value: "status" },
           ],
         },
@@ -961,8 +1003,25 @@ export default {
       selectedAccessPoint: null,
       loading: false,
       fetchInterval: null,
-      redMarkerIcon: L.icon({
+      apLocations: [],
+      blueMarkerIcon: L.icon({
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
+      redMarkerIcon: L.icon({
+        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      }),
+      greenMarkerIcon: L.icon({
+        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
@@ -979,7 +1038,7 @@ export default {
         (this.accessPointOptions.length === 1 && this.accessPointOptions[0].value === null)
       );
     },
-    mapMarkers() {
+    firstMapMarkers() {
       if (!this.rows || !this.rows.length) return [];
       return this.rows
         .filter(row => row.coordinates)
@@ -1006,6 +1065,44 @@ export default {
             lng
           };
         });
+    },
+    mainMapMarkers() {
+      const markers = [];
+
+      this.onlineAPRegisteredData.forEach((ap, index) => {
+        if (ap.coordinates) {
+          const [lng, lat] = ap.coordinates.split(",").map(Number);
+          markers.push({
+            id: `online-${index}`,
+            lat,
+            lng,
+            mac: ap.mac_address,
+            status: "online",
+            icon: this.greenMarkerIcon
+          });
+        }
+      });
+
+      this.offlineAPRegisteredData.forEach((ap, index) => {
+        if (ap.coordinates) {
+          const [lng, lat] = ap.coordinates.split(",").map(Number);
+          markers.push({
+            id: `offline-${index}`,
+            lat,
+            lng,
+            mac: ap.mac_address,
+            status: "offline",
+            icon: this.redMarkerIcon
+          });
+        }
+      });
+
+      if (this.showMainMarkersMode === "online") {
+        return markers.filter(m => m.status === "online");
+      } else if (this.showMainMarkersMode === "offline") {
+        return markers.filter(m => m.status === "offline");
+      }
+      return markers;
     },
   },
   async created() {
@@ -1313,22 +1410,23 @@ export default {
       this.showSecondaryModalTable = true;
       this.showSecondaryModalMap = false;
       this.activeSecondaryModalTab = 0;
-      this.enableSecondaryModalTab = this.secondaryModalHeaders.some(h => h.value === "coordinates");
+      this.enableSecondaryModalTab = false;
       
-      if(selectedCardTitle == "Current Online Users" || selectedCardTitle == "Total Active Users" || selectedCardTitle == "Total Registered Users"){
-        try{
-          let url;
-          if(selectedCardTitle == "Current Online Users"){
-            url = ApiService.getAllSessionsByUsernameForCurrentOnlineUsers( item.username );
-          }else if(selectedCardTitle == "Total Active Users"){
-            url = ApiService.getAllSessionsByUsernameForThePast7Days( item.username, );
-          }else if(selectedCardTitle == "Total Registered Users"){
-            url = ApiService.getAllSessionsByUsername( item.username, );
-          }
+      try {
+        let url, title, headers, items;
+
+        if (["Current Online Users", "Total Active Users", "Total Registered Users"].includes(selectedCardTitle)) {
+          this.enableSecondaryModalTab = true;
+          url =
+            selectedCardTitle === "Current Online Users"
+              ? ApiService.getAllSessionsByUsernameForCurrentOnlineUsers(item.username)
+              : selectedCardTitle === "Total Active Users"
+              ? ApiService.getAllSessionsByUsernameForThePast7Days(item.username)
+              : ApiService.getAllSessionsByUsername(item.username);
           const { data } = await url;
-          this.secondaryModalTitle = `User Session Details for ${item.username}`;
-          this.secondaryModalItems = data.userSessions|| [];
-          this.secondaryModalHeaders = [
+          title = `User Session Details for ${item.username}`;
+          items = data.userSessions || [];
+          headers = [
             { text: "Session ID", value: "acctSessionId" },
             { text: "Start Time", value: "startTime" },
             { text: "Duration", value: "duration" },
@@ -1337,58 +1435,29 @@ export default {
             { text: "AP ID", value: "calledStationId" },
             { text: "AP Location", value: "coordinates" },
           ];
-          // console.log("Fetched data:", this.secondaryModalItems);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(selectedCardTitle == "Current Online APs" || selectedCardTitle == "Total Active APs" || selectedCardTitle == "Total Inactive APs"){
-        try{
-          let url;
-          if(selectedCardTitle == "Current Online APs"){
-            url = ApiService.getCurrentOnlineApForTheLast30MinsByApId( item.calledStationId );
-          }else if(selectedCardTitle == "Total Active APs"){
-            url = ApiService.getAllActiveApForTheLast7DaysByApId( item.calledStationId );
-          }else if(selectedCardTitle == "Total Inactive APs"){
-            url = ApiService.getAllInActiveApForTheLast7DaysByApId( item.calledStationId );
-          }
+        }else if (["Current Online APs", "Total Active APs", "Total Inactive APs"].includes(selectedCardTitle)) {
+          url =
+            selectedCardTitle === "Current Online APs"
+              ? ApiService.getCurrentOnlineApForTheLast30MinsByApId(item.calledStationId)
+              : selectedCardTitle === "Total Active APs"
+              ? ApiService.getAllActiveApForTheLast7DaysByApId(item.calledStationId)
+              : ApiService.getAllInActiveApForTheLast7DaysByApId(item.calledStationId);
           const { data } = await url;
-          this.secondaryModalTitle = `Access Point Session Details for ${this.formatApId(item.calledStationId)}`;
-          this.secondaryModalItems = (Object.values(data)[0] || []).map(user => ({
-            ...user,
-            calledStationId: item.calledStationId
-          }));
-          this.secondaryModalHeaders = [
+          title = `Access Point Session Details for ${this.formatApId(item.calledStationId)}`;
+          items = (Object.values(data)[0] || []).map(u => ({ ...u, calledStationId: item.calledStationId }));
+          headers = [
             { text: "User", value: "userName" },
             { text: "Total Sessions", value: "totalSessions" },
-            { text: "total Time", value: "totalTime" },
+            { text: "Total Time", value: "totalTime" },
             { text: "Total Bandwidth", value: "totalBandwidth" },
             { text: "avg. Session Length", value: "avgSessionLength" },
           ];
-          // console.log("Fetched data:", this.secondaryModalItems);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
-        }
-      }else if(selectedCardTitle == "Total Down AP"){
-        try{
-          let url;
-          if(selectedCardTitle == "Total Down AP"){
-            url = ApiService.getRegisteredOfflineDevicesByApId( item.mac_address );
-          } /*else if(selectedCardTitle == "Total Device for Deployment"){
-            url = ApiService.getRogueDevicesByApId( item.mac_address );
-          }else if(selectedCardTitle == "Total Deployed AP"){
-            url = ApiService.getRegisteredDevicesByApId( item.mac_address );
-          } */
-          const { data } = await url;
-          this.secondaryModalTitle = `${selectedCardTitle} Details for ${item.mac_address}`;
-          this.secondaryModalItems = data.registeredAPs || []
-          // this.secondaryModalItems = (data.registeredAPs || []).map(ap =>  ({
-          //   ...ap,
-          // }));
-          this.secondaryModalHeaders = [
+        }else if (selectedCardTitle === "Total Down AP") {
+          this.enableSecondaryModalTab = true;
+          const { data } = await ApiService.getRegisteredOfflineDevicesByApId(item.mac_address);
+          title = `${selectedCardTitle} Details for ${item.mac_address}`;
+          items = data.registeredAPs || [];
+          headers = [
             { text: "Device Name", value: "device_name" },
             { text: "Model", value: "model" },
             { text: "Serial Number", value: "serial_number" },
@@ -1396,19 +1465,20 @@ export default {
             { text: "Mac Address", value: "mac_address" },
             { text: "Status", value: "status" },
             { text: "Date Offline", value: "date_offline" },
-            // { text: "Location", value: "location" },
-            { text: "Location", value: "coordinates" },
+            { text: "AP Location", value: "coordinates" },
           ];
-          // console.log("Fetched data:", this.secondaryModalItems);
-        } catch (error) {
-          // console.error("Error fetching data:", error);
-        } finally {
-          this.fetchingData = false;
         }
+
+        this.secondaryModalTitle = title;
+        this.secondaryModalItems = items;
+        this.secondaryModalHeaders = headers;
+      } catch (error) {
+        // console.error(error);
+      } finally {
+        this.fetchingData = false;
       }
     },
     async openTertiaryModal(item, selectedCardTitle) {
-      // console.log("openTertiaryModal:", item.username);
       this.showTertiaryModal = true;
       this.fetchingData = true;
       this.tertiaryModalItems = [];
