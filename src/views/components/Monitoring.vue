@@ -343,7 +343,7 @@
 
     <v-card class="pa-4 mb-6" style="height: 700px;">
       <v-card-title class="d-flex justify-space-between align-center pa-0 mb-3">
-        <span>Zeep Device Locations</span>
+        <span>Zeep Access Point Locations</span>
         <v-btn-toggle
           v-model="showMainMarkersMode"
           dense
