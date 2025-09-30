@@ -19,12 +19,13 @@ import { attachAuthInterceptor } from './http-common';
 import './router/permission';
 
 
-import { LMap, LMarker, LPopup, LTileLayer } from "vue2-leaflet";
+import { LMap, LMarker, LPopup, LTileLayer, LTooltip } from "vue2-leaflet";
 
 Vue.component("l-map", LMap);
 Vue.component("l-tile-layer", LTileLayer);
 Vue.component("l-marker", LMarker);
 Vue.component("l-popup", LPopup);
+Vue.component("l-tooltip", LTooltip);
 
 function scheduleTokenRefresh(keycloak) {
   const tokenParsed = keycloak.tokenParsed || {};
@@ -71,7 +72,7 @@ Vue.use(VueKeyCloak, {
   onReady: (keycloak) => {
     attachAuthInterceptor(keycloak);
     scheduleTokenRefresh(keycloak);
-    // console.log(keycloak.token);
+    console.log("val:", keycloak.token);
 
     new Vue({
       router,

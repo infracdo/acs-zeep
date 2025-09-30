@@ -373,10 +373,10 @@
             :lat-lng="[marker.lat, marker.lng]"
             :icon="marker.icon"
           >
-            <l-popup>
+            <l-tooltip direction="top">
               <b>MAC:</b> {{ marker.mac }} <br />
               <b>Status:</b> {{ marker.status }}
-            </l-popup>
+            </l-tooltip>
           </l-marker>
         </l-map>
       </v-card-text>
@@ -1018,6 +1018,7 @@ export default {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
+        tooltipAnchor: [0, -29],
         shadowSize: [41, 41]
       }),
       greenMarkerIcon: L.icon({
@@ -1026,6 +1027,7 @@ export default {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
+        tooltipAnchor: [0, -29],
         shadowSize: [41, 41]
       }),
     };
