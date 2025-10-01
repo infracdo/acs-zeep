@@ -2,13 +2,9 @@
   <v-container fluid class="pa-5">
     <!-- Overall Summary -->
     <v-card class="pa-4 mb-6">
-      <v-card-title class="pa-0 pb-2 text-h5">
-        Overall Summary
-      </v-card-title>
+      <v-card-title class="pa-0 pb-2 text-h5"> Overall Summary </v-card-title>
       <v-card class="pa-4 elevation-0">
-        <v-card-title class="pa-0 pb-2">
-          User Insights
-        </v-card-title>
+        <v-card-title class="pa-0 pb-2"> User Insights </v-card-title>
         <v-row>
           <v-col
             v-for="(card, index) in cardsUsers"
@@ -17,7 +13,11 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
+            <v-card
+              :style="{ backgroundColor: card.color }"
+              class="hover-card"
+              @click="openModal(card)"
+            >
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -39,9 +39,7 @@
         </v-row>
       </v-card>
       <v-card class="pa-4 elevation-0">
-        <v-card-title class="pa-0 pb-2">
-          AP Insights
-        </v-card-title>
+        <v-card-title class="pa-0 pb-2"> AP Insights </v-card-title>
         <v-row>
           <v-col
             v-for="(card, index) in cardsRadiusAP"
@@ -50,7 +48,11 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
+            <v-card
+              :style="{ backgroundColor: card.color }"
+              class="hover-card"
+              @click="openModal(card)"
+            >
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -78,7 +80,11 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
+            <v-card
+              :style="{ backgroundColor: card.color }"
+              class="hover-card"
+              @click="openModal(card)"
+            >
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -100,9 +106,7 @@
         </v-row>
       </v-card>
       <v-card class="pa-4 elevation-0">
-        <v-card-title class="pa-0 pb-2">
-          AP for Deployment
-        </v-card-title>
+        <v-card-title class="pa-0 pb-2"> AP for Deployment </v-card-title>
         <v-row>
           <v-col
             v-for="(card, index) in cardsAcsDownAP"
@@ -111,7 +115,11 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}" class="hover-card" @click="openModal(card)">
+            <v-card
+              :style="{ backgroundColor: card.color }"
+              class="hover-card"
+              @click="openModal(card)"
+            >
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -133,9 +141,7 @@
         </v-row>
       </v-card>
       <v-card class="pa-4 elevation-0">
-        <v-card-title class="pa-0 pb-2">
-          Today’s Overview
-        </v-card-title>
+        <v-card-title class="pa-0 pb-2"> Today’s Overview </v-card-title>
         <v-row>
           <v-col
             v-for="(card, index) in cardsTotal"
@@ -144,7 +150,7 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}">
+            <v-card :style="{ backgroundColor: card.color }">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -166,9 +172,7 @@
         </v-row>
       </v-card>
       <v-card class="pa-4 elevation-0">
-        <v-card-title class="pa-0 pb-2">
-          Cumulative Averages
-        </v-card-title>
+        <v-card-title class="pa-0 pb-2"> Cumulative Averages </v-card-title>
         <v-row>
           <v-col
             v-for="(card, index) in cardsAvg"
@@ -177,7 +181,7 @@
             sm="6"
             md="4"
           >
-            <v-card :style="{backgroundColor: card.color}">
+            <v-card :style="{ backgroundColor: card.color }">
               <v-card-title
                 class="font-weight-bold text-h3 text-right"
                 style="text-align: right; display: block; color: white"
@@ -263,20 +267,20 @@
               class="header-nowrap"
             >
               <!-- Format Date Created column -->
-              <template v-slot:item.timestamp="{item}">
+              <template v-slot:item.timestamp="{ item }">
                 {{ formatTimestamp(item.timestamp) }}
               </template>
 
               <!-- Format MAC address -->
-              <template v-slot:item.calling_station_id="{item}">
+              <template v-slot:item.calling_station_id="{ item }">
                 {{ formatMacAddress(item.calling_station_id) }}
               </template>
 
-              <template v-slot:item.acctinputoctets="{item}">
+              <template v-slot:item.acctinputoctets="{ item }">
                 {{ item.acctinputoctets ?? "-" }}
               </template>
 
-              <template v-slot:item.acctoutputoctets="{item}">
+              <template v-slot:item.acctoutputoctets="{ item }">
                 {{ item.acctoutputoctets ?? "-" }}
               </template>
             </v-data-table>
@@ -289,9 +293,7 @@
     <v-card class="pa-4 mb-6">
       <v-row align="center" class="ma-0">
         <v-col class="pa-0">
-          <v-card-title class="pa-0 mb-3">
-            List of Online APs
-          </v-card-title>
+          <v-card-title class="pa-0 mb-3"> List of Online APs </v-card-title>
         </v-col>
         <!-- <v-col
           class="pa-0"
@@ -341,7 +343,7 @@
       </v-col>
     </v-card>
 
-    <v-card class="pa-4 mb-6" style="height: 700px;">
+    <v-card class="pa-4 mb-6" style="height: 700px">
       <v-card-title class="d-flex justify-space-between align-center pa-0 mb-3">
         <span>Zeep Access Point Locations</span>
         <v-btn-toggle
@@ -356,12 +358,12 @@
         </v-btn-toggle>
       </v-card-title>
 
-      <v-card-text class="pa-0 pt-2" style="height: 94%;">
+      <v-card-text class="pa-0 pt-2" style="height: 94%">
         <l-map
           ref="mainMapRef"
           :zoom="6"
-          :center="[12.2, 121.7740]"
-          style="height: 100%; width: 100%;"
+          :center="[12.2, 121.774]"
+          style="height: 100%; width: 100%"
         >
           <l-tile-layer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -382,7 +384,11 @@
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="showModal" max-width="1400px" :style="{ 'z-index': 1400 }">
+    <v-dialog
+      v-model="showModal"
+      max-width="1400px"
+      :style="{ 'z-index': 1400 }"
+    >
       <v-card>
         <v-card-title class="text-h6">
           {{ selectedCard?.title }}
@@ -402,16 +408,33 @@
         </v-card-title>
 
         <div v-if="enableFirstModalTab">
-          <v-tabs v-model="activeFirstModalTab" :background-color="selectedCard?.color" :slider-color="'white'">
-            <v-tab :style="{ color: 'white' }" @click="showFirstModalTable = true; showFirstModalMap = false">Data</v-tab>
-            <v-tab :style="{ color: 'white' }" @click="showFirstModalTable = false; showFirstModalMap = true">Location</v-tab>
+          <v-tabs
+            v-model="activeFirstModalTab"
+            :background-color="selectedCard?.color"
+            :slider-color="'white'"
+          >
+            <v-tab
+              :style="{ color: 'white' }"
+              @click="
+                showFirstModalTable = true;
+                showFirstModalMap = false;
+              "
+              >Data</v-tab
+            >
+            <v-tab
+              :style="{ color: 'white' }"
+              @click="
+                showFirstModalTable = false;
+                showFirstModalMap = true;
+              "
+              >Location</v-tab
+            >
           </v-tabs>
         </div>
-        
-        <v-card-text>
-          <div v-if="selectedCard" style="margin-top: 16px;">
 
-            <div v-if="showFirstModalTable" style="margin-top: 16px;">
+        <v-card-text>
+          <div v-if="selectedCard" style="margin-top: 16px">
+            <div v-if="showFirstModalTable" style="margin-top: 16px">
               <v-data-table
                 :search="searchQuery"
                 :headers="selectedCard.headers"
@@ -423,48 +446,87 @@
                 class="solid-shadow"
               >
                 <template v-slot:no-data>
-                  <div v-if ="!fetchingData">
-                    No data available
-                  </div>
+                  <div v-if="!fetchingData">No data available</div>
                 </template>
-              
+
                 <template v-slot:item.calledStationId="{ item }">
-                  <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
+                  <div
+                    v-if="
+                      selectedCard &&
+                      (selectedCard?.title == 'Total Active Users' ||
+                        selectedCard?.title == 'Total Registered Users')
+                    "
+                  >
                     {{ formatApId(item.calledStationId) }}
                   </div>
 
-                  
-                  <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs' || selectedCard?.title == 'Total Active APs' || selectedCard?.title == 'Total Inactive APs')">
-                    <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
+                  <div
+                    v-if="
+                      selectedCard &&
+                      (selectedCard?.title == 'Current Online APs' ||
+                        selectedCard?.title == 'Total Active APs' ||
+                        selectedCard?.title == 'Total Inactive APs')
+                    "
+                  >
+                    <span
+                      @click.stop.prevent="
+                        openSecondaryModal(item, selectedCard.title)
+                      "
+                      style="cursor: pointer; color: #1976d2"
+                    >
                       {{ formatApId(item.calledStationId) }}
                     </span>
                   </div>
                 </template>
-                
+
                 <template v-slot:item.callingStationId="{ item }">
-                  <div v-if="selectedCard && (selectedCard?.title == 'Total Active Users' || selectedCard?.title == 'Total Registered Users')">
+                  <div
+                    v-if="
+                      selectedCard &&
+                      (selectedCard?.title == 'Total Active Users' ||
+                        selectedCard?.title == 'Total Registered Users')
+                    "
+                  >
                     {{ formatMacAddress(item.callingStationId) }}
                   </div>
                 </template>
-                  
+
                 <template v-slot:item.username="{ item }">
-                  <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                    {{ item.username || 'N/A' }}
+                  <span
+                    @click.stop.prevent="
+                      openSecondaryModal(item, selectedCard.title)
+                    "
+                    style="cursor: pointer; color: #1976d2"
+                  >
+                    {{ item.username || "N/A" }}
                   </span>
                 </template>
 
                 <template v-slot:item.device_name="{ item }">
-                  <div v-if="selectedCard && (selectedCard?.title == 'Total Down AP')">
-                    <span @click.stop.prevent="openSecondaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                      {{ item.device_name || 'N/A' }}
+                  <div
+                    v-if="
+                      selectedCard && selectedCard?.title == 'Total Down AP'
+                    "
+                  >
+                    <span
+                      @click.stop.prevent="
+                        openSecondaryModal(item, selectedCard.title)
+                      "
+                      style="cursor: pointer; color: #1976d2"
+                    >
+                      {{ item.device_name || "N/A" }}
                     </span>
                   </div>
 
-                  <div v-if="selectedCard && (selectedCard?.title != 'Total Down AP')">
-                      {{ item.device_name || 'N/A' }}
+                  <div
+                    v-if="
+                      selectedCard && selectedCard?.title != 'Total Down AP'
+                    "
+                  >
+                    {{ item.device_name || "N/A" }}
                   </div>
                 </template>
-                
+
                 <template v-slot:item.status="{ item }">
                   <span :style="{ color: statusColor(item.status) }">
                     {{ item.status }}
@@ -472,7 +534,11 @@
                 </template>
 
                 <template v-slot:item.coordinates="{ item }">
-                  <span class="text-blue-600 cursor-pointer underline"@click="focusOnMarkerForFirstModal(item)" style="cursor: pointer; color: #1976d2;">
+                  <span
+                    class="text-blue-600 cursor-pointer underline"
+                    @click="focusOnMarkerForFirstModal(item)"
+                    style="cursor: pointer; color: #1976d2"
+                  >
                     {{ item.coordinates }}
                   </span>
                 </template>
@@ -480,12 +546,15 @@
             </div>
           </div>
 
-          <div v-if="enableFirstModalTab && showFirstModalMap" style="height: 700px; width: 100%; margin-top: 16px;">
+          <div
+            v-if="enableFirstModalTab && showFirstModalMap"
+            style="height: 700px; width: 100%; margin-top: 16px"
+          >
             <l-map
               ref="mapRef"
               :zoom="6"
-              :center="[12.2, 121.7740]"
-              style="height: 100%; width: 100%;"
+              :center="[12.2, 121.774]"
+              style="height: 100%; width: 100%"
             >
               <l-tile-layer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -508,10 +577,20 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    
-    <v-dialog v-model="showSecondaryModal" max-width="1500px" :style="{ 'z-index': 2000 }">
+
+    <v-dialog
+      v-model="showSecondaryModal"
+      max-width="1500px"
+      :style="{ 'z-index': 2000 }"
+    >
       <v-card>
-        <v-card-title style="display: flex; align-items: center; justify-content: space-between;">
+        <v-card-title
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
           <span>{{ secondaryModalTitle }}</span>
           <v-btn icon @click="showSecondaryModal = false">
             <v-icon>mdi-close</v-icon>
@@ -519,15 +598,32 @@
         </v-card-title>
 
         <div v-if="enableSecondaryModalTab">
-          <v-tabs v-model="activeSecondaryModalTab" :background-color="selectedCard?.color" :slider-color="'white'">
-            <v-tab :style="{ color: 'white' }" @click="showSecondaryModalTable = true; showSecondaryModalMap = false">Data</v-tab>
-            <v-tab :style="{ color: 'white' }" @click="showSecondaryModalTable = false; showSecondaryModalMap = true">Location</v-tab>
+          <v-tabs
+            v-model="activeSecondaryModalTab"
+            :background-color="selectedCard?.color"
+            :slider-color="'white'"
+          >
+            <v-tab
+              :style="{ color: 'white' }"
+              @click="
+                showSecondaryModalTable = true;
+                showSecondaryModalMap = false;
+              "
+              >Data</v-tab
+            >
+            <v-tab
+              :style="{ color: 'white' }"
+              @click="
+                showSecondaryModalTable = false;
+                showSecondaryModalMap = true;
+              "
+              >Location</v-tab
+            >
           </v-tabs>
         </div>
 
         <v-card-text>
-          
-          <div v-if="showSecondaryModalTable" style="margin-top: 16px;">
+          <div v-if="showSecondaryModalTable" style="margin-top: 16px">
             <v-data-table
               :headers="secondaryModalHeaders"
               :loading="fetchingData"
@@ -548,44 +644,63 @@
               </template>
 
               <template v-slot:item.userName="{ item }">
-                <div v-if="selectedCard && (selectedCard?.title == 'Current Online APs')">
-                  <span @click.stop.prevent="openTertiaryModal(item, selectedCard.title)" style="cursor: pointer; color: #1976d2;">
-                    {{ item.userName || 'N/A' }}
+                <div
+                  v-if="
+                    selectedCard && selectedCard?.title == 'Current Online APs'
+                  "
+                >
+                  <span
+                    @click.stop.prevent="
+                      openTertiaryModal(item, selectedCard.title)
+                    "
+                    style="cursor: pointer; color: #1976d2"
+                  >
+                    {{ item.userName || "N/A" }}
                   </span>
                 </div>
                 <div v-else>
-                  {{ item.userName || 'N/A' }}
+                  {{ item.userName || "N/A" }}
                 </div>
               </template>
-              
+
               <template v-slot:item.status="{ item }">
                 <span :style="{ color: statusColor(item.status) }">
                   {{ item.status }}
                 </span>
               </template>
-              
+
               <template v-slot:item.coordinates="{ item }">
-                <span class="text-blue-600 cursor-pointer underline"@click="focusOnMarkerForSecondModal(item)" style="cursor: pointer; color: #1976d2;">
+                <span
+                  class="text-blue-600 cursor-pointer underline"
+                  @click="focusOnMarkerForSecondModal(item)"
+                  style="cursor: pointer; color: #1976d2"
+                >
                   {{ item.coordinates }}
                 </span>
               </template>
             </v-data-table>
           </div>
 
-          <div v-if="enableSecondaryModalTab && showSecondaryModalMap" style="height: 700px; width: 100%; margin-top: 16px;">
+          <div
+            v-if="enableSecondaryModalTab && showSecondaryModalMap"
+            style="height: 700px; width: 100%; margin-top: 16px"
+          >
             <l-map
               ref="secondaryMapRef"
               :zoom="6"
-              :center="[12.2, 121.7740]"
-              style="height: 100%; width: 100%;"
+              :center="[12.2, 121.774]"
+              style="height: 100%; width: 100%"
             >
-              <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+              <l-tile-layer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
               <l-marker
                 v-for="marker in secondaryMapMarkers"
                 :key="marker.id"
                 :lat-lng="[marker.lat, marker.lng]"
                 :icon="blueMarkerIcon"
-                >
+              >
                 <l-popup>{{ marker.name }}</l-popup>
               </l-marker>
             </l-map>
@@ -597,9 +712,19 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="showTertiaryModal" max-width="1800px" :style="{ 'z-index': 2000 }">
+    <v-dialog
+      v-model="showTertiaryModal"
+      max-width="1800px"
+      :style="{ 'z-index': 2000 }"
+    >
       <v-card>
-        <v-card-title style="display: flex; align-items: center; justify-content: space-between;">
+        <v-card-title
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
           <span>{{ tertiaryModalTitle }}</span>
           <v-btn icon @click="showTertiaryModal = false">
             <v-icon>mdi-close</v-icon>
@@ -617,7 +742,7 @@
             <template v-slot:no-data>
               <div>No data available</div>
             </template>
-            
+
             <template v-slot:item.calledStationId="{ item }">
               {{ formatApId(item.calledStationId) }}
             </template>
@@ -636,7 +761,6 @@
 import L from "leaflet";
 import ApiService from "../../api.service";
 
-
 export default {
   name: "MonitoringDashboard",
   data() {
@@ -653,6 +777,8 @@ export default {
       showModal: false,
       showSecondaryModal: false,
       showTertiaryModal: false,
+      secondaryModalTitle: "",
+      tertiaryModalTitle: "",
       searchQuery: "",
       selectedCard: null,
       rowsKey: 0,
@@ -690,7 +816,7 @@ export default {
             { text: "Total Sessions", value: "sessionCount" },
             { text: "Total Time", value: "totalTime" },
             { text: "Total Bandwidth", value: "totalBandwidthUsage" },
-            { text: "Avg. Session Length", value: "avgSessionLength" }
+            { text: "Avg. Session Length", value: "avgSessionLength" },
           ],
         },
         {
@@ -703,7 +829,7 @@ export default {
             { text: "Total Sessions", value: "sessionCount" },
             { text: "Total Time", value: "totalTime" },
             { text: "Total Bandwidth", value: "totalBandwidthUsage" },
-            { text: "Avg. Session Length", value: "avgSessionLength" }
+            { text: "Avg. Session Length", value: "avgSessionLength" },
           ],
         },
       ],
@@ -1006,65 +1132,122 @@ export default {
       apLocations: [],
       blueMarkerIcon: L.icon({
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
       }),
       redMarkerIcon: L.icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconUrl:
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
         tooltipAnchor: [0, -29],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
       }),
       greenMarkerIcon: L.icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconUrl:
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
         tooltipAnchor: [0, -29],
-        shadowSize: [41, 41]
+        shadowSize: [41, 41],
       }),
     };
-    
   },
   computed: {
     isAccessPointDropdownDisabled() {
       return (
         !this.accessPointOptions.length ||
-        (this.accessPointOptions.length === 1 && this.accessPointOptions[0].value === null)
+        (this.accessPointOptions.length === 1 &&
+          this.accessPointOptions[0].value === null)
       );
     },
     firstMapMarkers() {
       if (!this.rows || !this.rows.length) return [];
+
       return this.rows
-        .filter(row => row.coordinates)
-        .map(row => {
-          const [lng, lat] = row.coordinates.split(",").map(Number);
+        .filter((row) => {
+          if (!row.coordinates) return false;
+
+          const coords = row.coordinates
+            .split(",")
+            .map((c) => Number(c.trim()));
+          if (coords.length !== 2) return false;
+
+          const [lng, lat] = coords;
+
+          // Check that lat and lng are numbers and within valid ranges
+          const isValidCoords =
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            lat >= -90 &&
+            lat <= 90 &&
+            lng >= -180 &&
+            lng <= 180;
+
+          return isValidCoords;
+        })
+        .map((row) => {
+          const [lng, lat] = row.coordinates
+            .split(",")
+            .map((c) => Number(c.trim()));
           return {
             id: row.calledStationId || row.username || row.device_name,
             name: row.calledStationId || row.username || row.device_name,
             lat,
-            lng
+            lng,
           };
         });
     },
     secondaryMapMarkers() {
-      if (!this.secondaryModalItems || !this.secondaryModalItems.length) return [];
+      if (!this.secondaryModalItems || !this.secondaryModalItems.length)
+        return [];
+
+      const seen = new Set();
       return this.secondaryModalItems
-        .filter(row => row.coordinates)
-        .map(row => {
-          const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+        .filter((row) => {
+          const isValid = row.coordinates && row.calledStationId;
+          if (!isValid || seen.has(row.calledStationId)) return false;
+
+          const coords = row.coordinates
+            .split(",")
+            .map((c) => Number(c.trim()));
+
+          if (coords.length !== 2) return false;
+
+          const [lng, lat] = coords;
+
+          const isValidCoords =
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            lat >= -90 &&
+            lat <= 90 &&
+            lng >= -180 &&
+            lng <= 180;
+
+          if (!isValidCoords) return false;
+          seen.add(row.calledStationId);
+          return true;
+        })
+        .map((row) => {
+          const [lng, lat] = row.coordinates
+            .split(",")
+            .map((c) => Number(c.trim()));
+
           return {
-            id: row.calledStationId || row.username || row.acctSessionId,
-            name: row.calledStationId || row.username || row.acctSessionId,
+            id: row.calledStationId,
+            name: row.calledStationId,
             lat,
-            lng
+            lng,
           };
         });
     },
@@ -1080,7 +1263,7 @@ export default {
             lng,
             mac: ap.mac_address,
             status: "online",
-            icon: this.greenMarkerIcon
+            icon: this.greenMarkerIcon,
           });
         }
       });
@@ -1094,17 +1277,26 @@ export default {
             lng,
             mac: ap.mac_address,
             status: "offline",
-            icon: this.redMarkerIcon
+            icon: this.redMarkerIcon,
           });
         }
       });
 
       if (this.showMainMarkersMode === "online") {
-        return markers.filter(m => m.status === "online");
+        return markers.filter((m) => m.status === "online");
       } else if (this.showMainMarkersMode === "offline") {
-        return markers.filter(m => m.status === "offline");
+        return markers.filter((m) => m.status === "offline");
       }
       return markers;
+    },
+  },
+  // TODO: optimize by fetching data only when modal is opened
+  watch: {
+    showModal(newVal) {
+      if (newVal) {
+        this.page = 1;
+        this.fetchRows();
+      }
     },
   },
   async created() {
@@ -1126,21 +1318,23 @@ export default {
             return item;
           }
           let mac = item.value;
-          let name = '';
+          let name = "";
 
           // Only get device name if MAC address doesn't contain colon
-          if (!item.value.includes(':')) { // if station id does not contain colon then it is a lowercased mac
+          if (!item.value.includes(":")) {
+            // if station id does not contain colon then it is a lowercased mac
             try {
-              mac = this.formatMacAddress(item.value); // format lowercased mac 
+              mac = this.formatMacAddress(item.value); // format lowercased mac
               const response = await ApiService.getAPDeviceName(mac); // get device name of ap from mac
               name = response.data.deviceName;
               if (!name) {
-                name = 'No Device Name';
+                name = "No Device Name";
               }
             } catch {
-              name = 'No Device Name';
+              name = "No Device Name";
             }
-          } else { // if it contains a colon then it has ssid
+          } else {
+            // if it contains a colon then it has ssid
             const [macRaw, ssid] = item.value.split(":");
             mac = this.formatMacAddress(macRaw); // format mac address
             name = ssid;
@@ -1156,7 +1350,7 @@ export default {
       // Add ALL_APS option if there are 2 or more APs
       if (this.accessPointOptions.length >= 2) {
         this.formattedAccessPointOptions = [
-          { text: 'ALL APs', value: 'ALL_APS' },
+          { text: "ALL APs", value: "ALL_APS" },
           ...formatted,
         ];
       } else {
@@ -1168,7 +1362,8 @@ export default {
         this.loading = true;
 
         // Fetch all data in parallel
-        const [ // user insights
+        const [
+          // user insights
           countOnlineUsersResponse, // current online users
           countActiveUsersResponse, // total active users
           countRegisteredUsersResponse, // total registered users
@@ -1178,7 +1373,8 @@ export default {
           ApiService.getCountForAllRegisteredUsersWithSessions(),
         ]);
 
-        const [ // ap insights
+        const [
+          // ap insights
           countOnlineAPsResponse, // current online aps
           countActiveAPsResponse, // total active aps
           countInactiveAPsResponse, // total offline aps
@@ -1188,7 +1384,8 @@ export default {
           ApiService.getCountForAllInActiveApForMoreThan7Days(),
         ]);
 
-        const [ // today's overview
+        const [
+          // today's overview
           totalBandwidthConsumptionTodayResponse, // total bandwidth usage
           totalSessionTimeTodayResponse, // total session time
           totalUserSessionsTodayResponse, // total user sessions
@@ -1197,8 +1394,9 @@ export default {
           ApiService.getTotalSessionTimeToday(),
           ApiService.getTotalUserSessionsToday(),
         ]);
-        
-        const [ // cumulative averages
+
+        const [
+          // cumulative averages
           avgBandwidthConnectionResponse, // average bandwidth usage
           avgConnectionTimeResponse, // average session time
         ] = await Promise.all([
@@ -1206,7 +1404,8 @@ export default {
           ApiService.getAverageConnectionTimeForMonth(),
         ]);
 
-        const [ // acs aps
+        const [
+          // acs aps
           onlineAPsResponse, // online aps
           offlineAPsResponse, // offline aps
           registeredAPsResponse, // all registered aps
@@ -1216,13 +1415,13 @@ export default {
           ApiService.getAllRegisteredAPs(),
         ]);
 
-        const [ // acs aps
+        const [
+          // acs aps
           rogueAPsResponse, // all registered aps
-        ] = await Promise.all([
-          ApiService.getAllRogueAPs(),
-        ]);
+        ] = await Promise.all([ApiService.getAllRogueAPs()]);
 
-        const [ // tables
+        const [
+          // tables
           countConnectedUsersPerApResponse,
           onlineUsersPerApResponse,
           accessPointsResponse,
@@ -1241,9 +1440,12 @@ export default {
         this.cardsRadiusAP[1].value = countActiveAPsResponse.data.totalCount;
         this.cardsRadiusAP[2].value = countInactiveAPsResponse.data.totalCount;
 
-        this.cardsTotal[0].value = totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
-        this.cardsTotal[1].value = totalSessionTimeTodayResponse.data.totalSessionTimeToday;
-        this.cardsTotal[2].value = totalUserSessionsTodayResponse.data.totalUserSessionsToday;
+        this.cardsTotal[0].value =
+          totalBandwidthConsumptionTodayResponse.data.totalBandwidthConsumptionToday;
+        this.cardsTotal[1].value =
+          totalSessionTimeTodayResponse.data.totalSessionTimeToday;
+        this.cardsTotal[2].value =
+          totalUserSessionsTodayResponse.data.totalUserSessionsToday;
 
         this.cardsAvg[0].value =
           avgBandwidthConnectionResponse.data.averageBandwidthForMonth;
@@ -1265,15 +1467,15 @@ export default {
         this.onlineAPRegisteredData = onlineAPsResponse.data.registeredAPs;
         this.offlineAPRegisteredData = offlineAPsResponse.data.registeredAPs;
         this.totalRegisteredAPData = registeredAPsResponse.data.registeredAPs;
-        
+
         this.cardsAcsAP[0].value = this.onlineAPRegisteredData.length;
         this.cardsAcsAP[1].value = this.offlineAPRegisteredData.length;
         this.cardsAcsAP[2].value = this.totalRegisteredAPData.length;
-        
+
         this.rogueAPRegisteredData = rogueAPsResponse.data.rogueAPs;
-        
+
         this.cardsAcsDownAP[0].value = this.rogueAPRegisteredData.length;
-        
+
         // Setup options for the select field
         // NOTE: commented since this displays data retrieved from the wifidog (captive portal) database
         // this.currentConnectedAPs = currentConnectedAPs.data.data;
@@ -1284,15 +1486,17 @@ export default {
         const aps = accessPointsResponse.data.accessPoints || [];
 
         if (aps.length === 0) {
-          this.accessPointOptions = [{ text: 'NO ACTIVE APS FOUND', value: null }];
+          this.accessPointOptions = [
+            { text: "NO ACTIVE APS FOUND", value: null },
+          ];
           this.selectedAccessPoint = null;
         } else {
           this.accessPointOptions = aps
-            .filter(ap => ap != null)
-            .map(ap => ({ text: ap, value: ap }));
+            .filter((ap) => ap != null)
+            .map((ap) => ({ text: ap, value: ap }));
 
           if (!this.selectedAccessPoint) {
-            this.selectedAccessPoint = aps.length >= 2 ? 'ALL_APS' : aps[0];
+            this.selectedAccessPoint = aps.length >= 2 ? "ALL_APS" : aps[0];
           }
         }
 
@@ -1353,11 +1557,11 @@ export default {
           const apId = ap.called_station_id;
           addUniqueUsers(ap.currently_connected_users, apId);
         }
-      } 
+      }
       // === Single AP Mode ===
       else {
         const apData = this.allOnlineUsersData.find(
-          ap => ap.called_station_id === this.selectedAccessPoint
+          (ap) => ap.called_station_id === this.selectedAccessPoint
         );
         if (apData) {
           addUniqueUsers(apData.currently_connected_users);
@@ -1375,7 +1579,9 @@ export default {
       this.showFirstModalTable = true;
       this.showFirstModalMap = false;
       this.activeFirstModalTab = 0;
-      this.enableFirstModalTab = card.headers.some(h => h.value === "coordinates");
+      this.enableFirstModalTab = card.headers.some(
+        (h) => h.value === "coordinates"
+      );
 
       const apiMap = {
         "Current Online Users": ApiService.getAllCurrentOnlineUserDetails,
@@ -1405,7 +1611,7 @@ export default {
       }
     },
     async openSecondaryModal(item, selectedCardTitle) {
-      // console.log("openSecondaryModal:", item.username);
+      console.log("openSecondaryModal:", item.username);
       this.showSecondaryModal = true;
       this.secondaryModalItems = [];
       this.fetchingData = true;
@@ -1413,17 +1619,27 @@ export default {
       this.showSecondaryModalMap = false;
       this.activeSecondaryModalTab = 0;
       this.enableSecondaryModalTab = false;
-      
+
       try {
         let url, title, headers, items;
 
-        if (["Current Online Users", "Total Active Users", "Total Registered Users"].includes(selectedCardTitle)) {
+        if (
+          [
+            "Current Online Users",
+            "Total Active Users",
+            "Total Registered Users",
+          ].includes(selectedCardTitle)
+        ) {
           this.enableSecondaryModalTab = true;
           url =
             selectedCardTitle === "Current Online Users"
-              ? ApiService.getAllSessionsByUsernameForCurrentOnlineUsers(item.username)
+              ? ApiService.getAllSessionsByUsernameForCurrentOnlineUsers(
+                  item.username
+                )
               : selectedCardTitle === "Total Active Users"
-              ? ApiService.getAllSessionsByUsernameForThePast7Days(item.username)
+              ? ApiService.getAllSessionsByUsernameForThePast7Days(
+                  item.username
+                )
               : ApiService.getAllSessionsByUsername(item.username);
           const { data } = await url;
           title = `User Session Details for ${item.username}`;
@@ -1437,16 +1653,33 @@ export default {
             { text: "AP ID", value: "calledStationId" },
             { text: "AP Location", value: "coordinates" },
           ];
-        }else if (["Current Online APs", "Total Active APs", "Total Inactive APs"].includes(selectedCardTitle)) {
+        } else if (
+          [
+            "Current Online APs",
+            "Total Active APs",
+            "Total Inactive APs",
+          ].includes(selectedCardTitle)
+        ) {
           url =
             selectedCardTitle === "Current Online APs"
-              ? ApiService.getCurrentOnlineApForTheLast30MinsByApId(item.calledStationId)
+              ? ApiService.getCurrentOnlineApForTheLast30MinsByApId(
+                  item.calledStationId
+                )
               : selectedCardTitle === "Total Active APs"
-              ? ApiService.getAllActiveApForTheLast7DaysByApId(item.calledStationId)
-              : ApiService.getAllInActiveApForTheLast7DaysByApId(item.calledStationId);
+              ? ApiService.getAllActiveApForTheLast7DaysByApId(
+                  item.calledStationId
+                )
+              : ApiService.getAllInActiveApForTheLast7DaysByApId(
+                  item.calledStationId
+                );
           const { data } = await url;
-          title = `Access Point Session Details for ${this.formatApId(item.calledStationId)}`;
-          items = (Object.values(data)[0] || []).map(u => ({ ...u, calledStationId: item.calledStationId }));
+          title = `Access Point Session Details for ${this.formatApId(
+            item.calledStationId
+          )}`;
+          items = (Object.values(data)[0] || []).map((u) => ({
+            ...u,
+            calledStationId: item.calledStationId,
+          }));
           headers = [
             { text: "User", value: "userName" },
             { text: "Total Sessions", value: "totalSessions" },
@@ -1454,9 +1687,11 @@ export default {
             { text: "Total Bandwidth", value: "totalBandwidth" },
             { text: "avg. Session Length", value: "avgSessionLength" },
           ];
-        }else if (selectedCardTitle === "Total Down AP") {
+        } else if (selectedCardTitle === "Total Down AP") {
           this.enableSecondaryModalTab = true;
-          const { data } = await ApiService.getRegisteredOfflineDevicesByApId(item.mac_address);
+          const { data } = await ApiService.getRegisteredOfflineDevicesByApId(
+            item.mac_address
+          );
           title = `${selectedCardTitle} Details for ${item.mac_address}`;
           items = data.registeredAPs || [];
           headers = [
@@ -1481,14 +1716,23 @@ export default {
       }
     },
     async openTertiaryModal(item, selectedCardTitle) {
+      console.log;
       this.showTertiaryModal = true;
       this.fetchingData = true;
       this.tertiaryModalItems = [];
-      
-      if(selectedCardTitle == "Current Online APs"){
-        try{
-          console.log("Fetching tertiary modal for:", item.calledStationId, item.userName);
-          const { data } = await ApiService.getSessionForCurrentOnlineUsersByUsernameAndApId( item.calledStationId, item.userName );
+
+      if (selectedCardTitle == "Current Online APs") {
+        try {
+          console.log(
+            "Fetching tertiary modal for:",
+            item.calledStationId,
+            item.userName
+          );
+          const { data } =
+            await ApiService.getSessionForCurrentOnlineUsersByUsernameAndApId(
+              item.calledStationId,
+              item.userName
+            );
 
           this.tertiaryModalTitle = `User Session Details for ${item.userName}`;
           this.tertiaryModalItems = data.currentOnlineApByUserAndApId || [];
@@ -1533,19 +1777,29 @@ export default {
       return cleaned.match(/.{1,2}/g)?.join(":") || mac;
     },
     formatApId(value) {
-      if (!value) return '';
-      const part = value.split(':')[0];
+      if (!value) return "";
+      const part = value.split(":")[0];
       const upper = part.toUpperCase();
-      return upper.match(/.{1,2}/g).join(':');
+      return upper.match(/.{1,2}/g).join(":");
     },
     statusColor(status) {
-      if (status.toLowerCase() === 'online') return 'green';
-      if (status.toLowerCase() === 'offline') return 'red';
-      return 'gray';
+      if (status.toLowerCase() === "online") return "green";
+      if (status.toLowerCase() === "offline") return "red";
+      return "gray";
     },
     focusOnMarkerForFirstModal(row) {
       if (!row.coordinates) return;
-      const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+      const coords = row.coordinates.split(",").map((c) => Number(c.trim()));
+      if (coords.length !== 2) return;
+      const [lng, lat] = coords;
+      const isValidCoords =
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180;
+      if (!isValidCoords) return;
       this.showFirstModalMap = true;
       this.showFirstModalTable = false;
       this.activeFirstModalTab = 1;
@@ -1557,7 +1811,17 @@ export default {
     },
     focusOnMarkerForSecondModal(row) {
       if (!row.coordinates) return;
-      const [lng, lat] = row.coordinates.split(",").map(c => Number(c.trim()));
+      const coords = row.coordinates.split(",").map((c) => Number(c.trim()));
+      if (coords.length !== 2) return;
+      const [lng, lat] = coords;
+      const isValidCoords =
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180;
+      if (!isValidCoords) return;
       this.showSecondaryModalMap = true;
       this.showSecondaryModalTable = false;
       this.activeSecondaryModalTab = 1;
@@ -1566,16 +1830,6 @@ export default {
           this.$refs.secondaryMapRef.mapObject.setView([lat, lng], 13);
         }
       });
-    },
-    
-  },
-  // TODO: optimize by fetching data only when modal is opened
-  watch: {
-    showModal(newVal) {
-      if (newVal) {
-        this.page = 1;
-        this.fetchRows();
-      }
     },
   },
 };
@@ -1602,11 +1856,10 @@ export default {
 
 .hover-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 5px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
 }
 
 .solid-shadow {
-  box-shadow: 0 0 5px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
 }
-
 </style>
